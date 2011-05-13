@@ -1,0 +1,25 @@
+DeltaBlue is a one-way constraint solver, originally written in Smalltalk by John Maloney and Mario Wolczko.
+
+It is frequently used as a benchmark to evaluate the cost of polymorphism in different language implementations.
+
+This repository contains a port of JavaScript version of DeltaBlue from V8 Benchmark Suite[1] to Lua.
+
+JavaScript version heavily uses global variables which is considered a bad taste in Lua so two versions of translation are provided:
+
+    deltablue-globals.lua - all global variables from JS version became global variables in Lua version
+
+    deltablue-locals.lua - most global variables from JS version became local variables in Lua version 
+
+A runner script that performs 10000 iterations of the benchmark is included for convenience.
+
+Usage:
+
+    % lua deltablue-10000iterations.lua locals
+    % lua deltablue-10000iterations.lua globals
+
+To measure original version:
+
+    % shell deltablue-10000iterations.js 
+
+
+[1] http://v8.googlecode.com/svn/data/benchmarks/v6/README.txt  
