@@ -112,30 +112,33 @@ class Mandelbrot {
    }
 
    public static void main(String[] args) {
-      int budget = Integer.parseInt(args[0]);
-
-      int iterations = 0;
-
-      long start = System.nanoTime();
-      long elapsed;
-
-      while (true) {
-         if (!sample()) {
-            throw new RuntimeException();
-         }
-
-         iterations++;
-
-         elapsed = System.nanoTime() - start;
-
-         if (elapsed > budget * 1e9)
-            break;
+      if (!sample()) {
+          throw new RuntimeException();
       }
 
-      double score = iterations / (elapsed / 1e9) * 1000.0;
+      int problemSize = 1000;
+      int iterations = 100;
 
-      System.out.println(score);
+      if (args.length >= 1) {
+          problemSize = Integer.parseInt(args[0]);
+      }
+      
+      if (args.length >= 2) {
+          iterations = Integer.parseInt(args[1]);
+      }
+      
+      System.out.println("Mandelbrot problem size set to: " + problemSize);
+      System.out.println("Overall iterations: " + iterations);
+
+      while (iterations > 0) {
+         long start = System.nanoTime();
+         mandelbrot(problemSize);
+         long elapsed = (System.nanoTime() - start) / 1000;
+         iterations--;
+         
+         System.out.println("Mandelbrot: iterations=1 runtime: " +
+             elapsed + "us");
+      }
    }
-
 }
 
