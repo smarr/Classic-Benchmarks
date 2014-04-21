@@ -43,7 +43,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-int mandelbrot(double size) {
+int mandelbrot(int size) {
  int sum = 0;
 
  int byte_acc = 0;
@@ -103,47 +103,51 @@ int mandelbrot(double size) {
  return sum;
 }
 
-void warmup() {
-  for (int n = 0; n < 10000; n++) {
-     mandelbrot(10);
-  }
-}
-
 int sample() {
   return mandelbrot(750) == 192;
 }
 
-double secondtime();
-
-int main(int argc, char** argv) {
-  int budget = atoi(argv[0]);
-
-  int iterations = 0;
-
-  double start = secondtime();
-  double elapsed;
-
-  while (1) {
-     if (!sample()) {
-        abort();
-     }
-
-     iterations++;
-
-     elapsed = secondtime() - start;
-
-     if (elapsed > budget)
-        break;
-  }
-
-  double score = iterations / elapsed * 1000.0;
-
-  printf("%f\n", score);
-}
-
-double secondtime() {
+unsigned long microseconds() {
   // Not monotonic
   struct timeval t;
   gettimeofday(&t, NULL);
-  return t.tv_sec + t.tv_usec / 1e6;
+  return (t.tv_sec * 1000 * 1000) + t.tv_usec;
 }
+
+int main(int argc, char** argv) {
+  if (!sample()) {
+     printf("Sanity check failed! Mandelbrot gives wrong result.\n");
+     abort();
+  }
+  
+  int problem_size = 1000;
+  if (argc > 1) {
+    problem_size = atoi(argv[1]);
+  }
+  
+  int iterations = 100;
+  if (argc > 2) {
+    iterations = atoi(argv[2]);
+  }
+  
+  printf("Mandelbrot problem size set to: %d.\n", problem_size);
+  printf("Overall iterations: %d.\n", iterations);
+
+  volatile int result = 0; // to avoid mandelbrot() being optimized out  
+  
+  while (iterations > 0) {
+     unsigned long start = microseconds();
+     result += mandelbrot(problem_size);
+     unsigned long elapsed = microseconds() - start;
+     printf("Mandelbrot: iterations=1 runtime: %lu%s\n", elapsed, "us");
+     iterations--;
+  }
+  
+  if (result == 0) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+
