@@ -1096,7 +1096,7 @@ int main(int argc, char* argv[])
     iterations = atoi(argv[2]);
   }
   
-  printf("DeltaBlue problem size (inner iterations set to: %d.\n", inner_iterations);
+  printf("DeltaBlue problem size (inner iterations) set to: %d.\n", inner_iterations);
   printf("Overall iterations: %d.\n", iterations);
   
   while (iterations > 0) {
