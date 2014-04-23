@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 #ifdef bench100
 #define                Count           10000*100
@@ -344,11 +345,10 @@ void append(struct packet *pkt, struct packet *ptr)
     ptr->p_link = pkt;
 }
 
-int main()
-{
+int bench() {
     struct packet *wkq = 0;
 
-    printf("Bench mark starting\n");
+    // printf("Bench mark starting\n");
 
     createtask(I_IDLE, 0, wkq, S_RUN, idlefn, 1, Count);
 
@@ -377,24 +377,67 @@ int main()
 
     qpktcount = holdcount = 0;
 
-    printf("Starting\n");
+    // printf("Starting\n");
 
     tracing = FALSE;
     layout = 0;
 
     schedule();
 
-    printf("\nfinished\n");
+    // printf("\nfinished\n");
 
-    printf("qpkt count = %d  holdcount = %d\n",
-           qpktcount, holdcount);
+    
 
-    printf("These results are ");
-    if (qpktcount == Qpktcountval && holdcount == Holdcountval)
-        printf("correct");
-    else printf("incorrect");
-
-    printf("\nend of run\n");
-    return 0;
+    
+    if (!(qpktcount == Qpktcountval && holdcount == Holdcountval)) {
+        printf("qpkt count = %d  holdcount = %d\n", qpktcount, holdcount);
+        printf("These results are incorrect");
+        exit(1);
+    }
+    // printf("\nend of run\n");
+    return qpktcount;
 }
+
+unsigned long microseconds() {
+    // Not monotonic
+    struct timeval t;
+    gettimeofday(&t, NULL);
+    return (t.tv_sec * 1000 * 1000) + t.tv_usec;
+}
+
+int inner_loop(int inner) {
+    int r = 0;
+    while (inner > 0) {
+        r += bench();
+        inner--;
+    }
+    return r;
+}
+
+int main(int argc, char* argv[])
+{
+    int inner_iterations = 10;
+    
+    if (argc > 1) {
+        inner_iterations = atoi(argv[1]);
+    }
+    
+    int iterations = 100;
+    if (argc > 2) {
+        iterations = atoi(argv[2]);
+    }
+    
+    printf("Richards problem size (inner iterations) set to: %d.\n", inner_iterations);
+    printf("Overall iterations: %d.\n", iterations);
+    
+    int result = 0;
+    while (iterations > 0) {
+        unsigned long start = microseconds();
+        result += inner_loop(inner_iterations);
+        unsigned long elapsed = microseconds() - start;
+        printf("Richards: iterations=1 runtime: %lu%s\n", elapsed, "us");
+        iterations--;
+    }
+}
+
 
