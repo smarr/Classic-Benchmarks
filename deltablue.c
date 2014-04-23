@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <sys/time.h>
 
 typedef enum {false, true} Boolean;
 typedef	void (*Proc)();
@@ -951,29 +952,6 @@ Constraint ScaleOffsetC(Variable src, Variable scale, Variable offset,
   return new;
 };
 
-/***************************************************************************
-
-    Timing Functions
-
-****************************************************************************/
-
-long startTime;
-
-long Milliseconds()
-{
-  int millisecondsPerClock = CLOCKS_PER_SEC / 1000;
-  return (clock() / millisecondsPerClock);
-}
-
-void Start()
-{
-  startTime = Milliseconds();
-}
-
-void Finish(long *milliseconds)
-{
-  *milliseconds = Milliseconds() - startTime;
-}
 
 /***************************************************************************
 *
@@ -1097,31 +1075,36 @@ void ProjectionTest(int n)
   List_Destroy(dests);
 }
 
+unsigned long microseconds() {
+  // Not monotonic
+  struct timeval t;
+  gettimeofday(&t, NULL);
+  return (t.tv_sec * 1000 * 1000) + t.tv_usec;
+}
+
+
 int main(int argc, char* argv[])
 {  
-  int iterations= 1000;
-  char options_array[100];
-  char* options = options_array; // I don't do c :(
+  int inner_iterations = 1000;
 
-  if (argc > 1)
-    iterations = atoi(argv[1]);
-
-  if (iterations < 1)
-    iterations= 1000;
-
-  if (argc > 2)
-    options = argv[2];
-
-  int n= 100, j;
-  long msecs;
-  
-  Start();
-  for (j= 0; j < iterations; ++j) {
-    ChainTest(n);
-    ProjectionTest(n);
+  if (argc > 1) {
+    inner_iterations = atoi(argv[1]);
   }
 
-  Finish(&msecs);
-  printf("DeltaBlue\tC\t%s\t%dx\t%gms\n", options, iterations, (double)msecs / iterations);
+  int iterations = 100;
+  if (argc > 2) {
+    iterations = atoi(argv[2]);
+  }
   
+  printf("DeltaBlue problem size (inner iterations set to: %d.\n", inner_iterations);
+  printf("Overall iterations: %d.\n", iterations);
+  
+  while (iterations > 0) {
+    unsigned long start = microseconds();
+    ChainTest(inner_iterations);
+    ProjectionTest(inner_iterations);
+    unsigned long elapsed = microseconds() - start;
+    printf("DeltaBlue: iterations=1 runtime: %lu%s\n", elapsed, "us");
+    iterations--;
+  }
 }
