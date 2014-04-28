@@ -25,6 +25,8 @@
 $planner = nil
 
 class Strength
+    attr_accessor :strength
+
     def initialize(strength, name)
       @strength = strength
       @name     = name
@@ -82,6 +84,7 @@ end
 
 
 class Constraint
+    attr_accessor :strength
 
     def initialize(strength)
         @strength = strength
@@ -384,6 +387,13 @@ class EqualityConstraint < BinaryConstraint
 end
 
 class Variable
+    attr_accessor :mark
+    attr_accessor :walk_strength
+    attr_accessor :determined_by
+    attr_accessor :stay
+    attr_accessor :value
+    attr_accessor :constraints
+
     def initialize(name, initial_value = 0)
         @name          = name
         @value         = initial_value
