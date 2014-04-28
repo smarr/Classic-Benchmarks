@@ -601,7 +601,7 @@ def chain_test(n)
     prev, first, last = nil, nil, nil
 
     # We need to go up to n inclusively.
-    for i in 0..(n + 1)
+    for i in 0..n
         name = "v%s" % i
         v = Variable.new(name)
 
@@ -626,7 +626,7 @@ def chain_test(n)
     edits << edit
     plan = $planner.extract_plan_from_constraints(edits)
 
-    for i in 0..100
+    for i in 0..99
         first.value = i
         plan.execute
 
@@ -649,7 +649,7 @@ def projection_test(n)
 
     dests = []
 
-    for i in 0..n
+    for i in 0..(n - 1)
         src = Variable("src%s" % i, i)
         dst = Variable("dst%s" % i, i)
         dests << dst
@@ -671,7 +671,7 @@ def projection_test(n)
 
     change(scale, 5)
 
-    for i in 0..(n - 1)
+    for i in 0..(n - 2)
         if dests[i].value != (i * 5 + 1000)
             puts 'Projection 3 failed'
         end
@@ -679,7 +679,7 @@ def projection_test(n)
 
     change(offset, 2000)
 
-    for i in 0..(n - 1)
+    for i in 0..(n - 2)
         if dests[i].value != (i * 5 + 2000)
             puts 'Projection 4 failed'
         end
@@ -694,7 +694,7 @@ def change(v, new_value)
 
     plan = $planner.extract_plan_from_constraints(edits)
 
-    for i in 0..10
+    for i in 0..9
         v.value = new_value
         plan.execute
     end
