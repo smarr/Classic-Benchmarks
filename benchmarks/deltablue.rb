@@ -96,7 +96,7 @@ class Constraint
         choose_method(mark)
 
         if not is_satisfied
-            if strength == Strength.REQUIRED
+            if @strength == Strength::REQUIRED
                 puts 'Could not satisfy a required constraint!'
                 return nil
             end
@@ -432,7 +432,7 @@ class Planner
         constraint.mark_unsatisfied
         constraint.remove_from_graph
         unsatisfied = remove_propagate_from(out)
-        strength    = Strength.REQUIRED
+        strength    = Strength::REQUIRED
 
         loop do
             for u in unsatisfied
@@ -442,7 +442,7 @@ class Planner
 
                 strength = strength.next_weaker
             end
-            break if strength != Strength.WEAKEST
+            break if strength != Strength::WEAKEST
         end
     end
 
@@ -502,7 +502,7 @@ class Planner
 
     def remove_propagate_from(out)
         out.determined_by = nil
-        out.walk_strength = Strength.WEAKEST
+        out.walk_strength = Strength::WEAKEST
         out.stay = true
         unsatisfied = []
         todo = []
