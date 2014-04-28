@@ -12,13 +12,9 @@ MAXTASKS = 6
 $layout = 0
 
 
-def main()
-   reps = Integer(ARGV.shift || 10)
-   
-   startTicks = Process.times.utime
-   
+def run(iterations)
    s = Scheduler.new 
-   for i in 0..reps 
+   for i in 0..iterations
      s.reset
      s.addIdleTask(IDLE, 0, nil, 10000)
 
@@ -39,12 +35,12 @@ def main()
      s.addDeviceTask(DEVICEA, 4000, nil) 
      s.addDeviceTask(DEVICEB, 5000, nil)           
      s.schedule
+     
+     if s.holdCount != 9297 or s.queueCount != 23246
+       return false
+     end
    end
-   
-   stopTicks = Process.times.utime  
-   frequency = 1000
-   print "Total time for #{reps} iterations: #{stopTicks-startTicks}s\n"
-   print "Average time per iteration: #{Integer(((stopTicks-startTicks)/reps)*1000)}ms\n"
+   return true
 end
 
 
@@ -385,4 +381,43 @@ class Packet
 
 end
 
-main
+iterations   = 100
+warmup       = 0
+innerIter    = 1
+
+if ARGV.size >= 1
+  iterations = ARGV[0].to_i
+end
+
+if ARGV.size >= 2
+  warmup = ARGV[1].to_i
+end
+
+if ARGV.size >= 3
+  innerIter = ARGV[2].to_i
+end
+
+
+puts "Overall iterations: #{iterations}."
+puts "Warmup  iterations: #{warmup}."
+puts "Inner   iterations: #{innerIter}."
+
+warmup.times do
+  if not run(innerIter)
+    puts "Benchmark delivers wrong results. Run failed."
+    exit 1
+  end
+end
+
+result = true
+iterations.times do
+  start   = Time.now
+  result  = result and run(innerIter)
+  elapsed = (Time.now - start) * 1000.0 * 1000.0
+  puts "Richards: iterations=1 runtime: %.0fus" % [elapsed]
+end
+
+if not result
+  puts "Benchmark delivers wrong results. Run failed."
+  exit 1
+end
