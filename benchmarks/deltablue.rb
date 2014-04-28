@@ -60,7 +60,7 @@ class Strength
         return s2
     end
 
-    def next_weaker()
+    def next_weaker
       case @strength
         when 0
           WEAKEST
