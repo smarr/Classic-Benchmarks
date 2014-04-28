@@ -462,7 +462,7 @@ class Planner
 
     def make_plan(sources)
         mark = new_mark
-        plan = Plan()
+        plan = Plan.new()
         todo = sources
 
         until todo.empty?
@@ -642,15 +642,15 @@ def projection_test(n)
     # mapping and to change the scale and offset factors.
 
     $planner = Planner.new
-    scale   = Variable("scale", 10)
-    offset  = Variable("offset", 1000)
+    scale   = Variable.new("scale", 10)
+    offset  = Variable.new("offset", 1000)
     src, dst = nil, nil
 
     dests = []
 
     for i in 0..(n - 1)
-        src = Variable("src%s" % i, i)
-        dst = Variable("dst%s" % i, i)
+        src = Variable.new("src%s" % i, i)
+        dst = Variable.new("dst%s" % i, i)
         dests << dst
         StayConstraint.new(src, Strength::NORMAL)
         ScaleConstraint.new(src, scale, offset, dst, Strength::REQUIRED)
