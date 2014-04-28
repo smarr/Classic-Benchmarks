@@ -210,7 +210,6 @@ class EditConstraint < UnaryConstraint
 
     def execute
         # This constraint also does nothing.
-        pass
     end
 end
 
