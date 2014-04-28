@@ -253,7 +253,7 @@ class BinaryConstraint < Constraint
                 @direction = Direction::NONE
             end
         else
-            if Strength.stronger(self.strength, self.v2.walk_strength)
+            if Strength.stronger(@strength, @v2.walk_strength)
                 @direction = Direction::FORWARD
             else
                 @direction = Direction::BACKWARD
