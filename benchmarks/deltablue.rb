@@ -101,8 +101,8 @@ class Constraint
         if not is_satisfied
             if @strength == Strength::REQUIRED
                 puts 'Could not satisfy a required constraint!'
-                return nil
             end
+            return nil
         end
 
         mark_inputs(mark)
