@@ -19,19 +19,24 @@
 # 
 # .. _`V8's source code`: (http://code.google.com/p/v8/source/browse/branches/bleeding_edge/benchmarks/deltablue.js)
 
-class Strength
-    REQUIRED         = nil
-    STRONG_PREFERRED = nil
-    PREFERRED        = nil
-    STRONG_DEFAULT   = nil
-    NORMAL           = nil
-    WEAK_DEFAULT     = nil
-    WEAKEST          = nil
 
+# HOORAY FOR GLOBALS... Oh wait.
+# In spirit of the original, we'll keep it, but ugh.
+$planner = nil
+
+class Strength
     def initialize(strength, name)
-        @strength = strength
-        @name     = name
+      @strength = strength
+      @name     = name
     end
+
+    REQUIRED         = self.new(0, "required")
+    STRONG_PREFERRED = self.new(1, "strongPreferred")
+    PREFERRED        = self.new(2, "preferred")
+    STRONG_DEFAULT   = self.new(3, "strongDefault")
+    NORMAL           = self.new(4, "normal")
+    WEAK_DEFAULT     = self.new(5, "weakDefault")
+    WEAKEST          = self.new(6, "weakest")
 
     def self.stronger(s1, s2)
         s1.strength < s2.strength
@@ -76,16 +81,6 @@ class Strength
 end
 
 
-# This is a terrible pattern IMO, but true to the original JS implementation.
-Strength.REQUIRED        = Strength(0, "required")
-Strength.STONG_PREFERRED = Strength(1, "strongPreferred")
-Strength.PREFERRED       = Strength(2, "preferred")
-Strength.STRONG_DEFAULT  = Strength(3, "strongDefault")
-Strength.NORMAL          = Strength(4, "normal")
-Strength.WEAK_DEFAULT    = Strength(5, "weakDefault")
-Strength.WEAKEST         = Strength(6, "weakest")
-
-
 class Constraint
 
     def initialize(strength)
@@ -94,7 +89,7 @@ class Constraint
 
     def add_constraint
         add_to_graph
-        planner.incremental_add(self)
+        $planner.incremental_add(self)
     end
 
     def satisfy(mark)
@@ -117,7 +112,7 @@ class Constraint
 
         out.determined_by = self
 
-        unless planner.add_propagate(self, mark)
+        unless $planner.add_propagate(self, mark)
             puts 'Cycle encountered'
         end
 
@@ -127,7 +122,7 @@ class Constraint
 
     def destroy_constraint
         if is_satisfied
-            planner.incremental_remove(self)
+            $planner.incremental_remove(self)
         else
             remove_from_graph
         end
@@ -230,38 +225,38 @@ class BinaryConstraint < Constraint
         super(strength)
         @v1 = v1
         @v2 = v2
-        @direction = Direction.NONE
+        @direction = Direction::NONE
         add_constraint
     end
 
     def choose_method(mark)
         if @v1.mark == mark
-            if @v2.mark != mark and Strength.stronger(@strength, @v2.walk_strength)
-                @direction = Direction.FORWARD
+            if @v2.mark != mark and Strength::stronger(@strength, @v2.walk_strength)
+                @direction = Direction::FORWARD
             else
-                @direction = Direction.BACKWARD
+                @direction = Direction::BACKWARD
             end
         end
 
         if @v2.mark == mark
-            if @v1.mark != mark and Strength.stronger(@strength, @v1.walk_strength)
-                @direction = Direction.BACKWARD
+            if @v1.mark != mark and Strength::stronger(@strength, @v1.walk_strength)
+                @direction = Direction::BACKWARD
             else
-                @direction = Direction.NONE
+                @direction = Direction::NONE
             end
         end
 
         if Strength.weaker(@v1.walk_strength, @v2.walk_strength)
             if Strength.stronger(@strength, @v1.walk_strength)
-                @direction = Direction.BACKWARD
+                @direction = Direction::BACKWARD
             else
-                @direction = Direction.NONE
+                @direction = Direction::NONE
             end
         else
             if Strength.stronger(self.strength, self.v2.walk_strength)
-                @direction = Direction.FORWARD
+                @direction = Direction::FORWARD
             else
-                @direction = Direction.BACKWARD
+                @direction = Direction::BACKWARD
             end
         end
     end
@@ -269,11 +264,11 @@ class BinaryConstraint < Constraint
     def add_to_graph
         @v1.add_constraint(self)
         @v2.add_constraint(self)
-        @direction = Direction.NONE
+        @direction = Direction::NONE
     end
 
     def is_satisfied
-        @direction != Direction.NONE
+        @direction != Direction::NONE
     end
 
     def mark_inputs(mark)
@@ -281,7 +276,7 @@ class BinaryConstraint < Constraint
     end
 
     def input
-        if @direction == Direction.FORWARD
+        if @direction == Direction::FORWARD
             return @v1
         end
 
@@ -289,7 +284,7 @@ class BinaryConstraint < Constraint
     end
 
     def output
-        if @direction == Direction.FORWARD
+        if @direction == Direction::FORWARD
             return @v2
         end
 
@@ -308,7 +303,7 @@ class BinaryConstraint < Constraint
     end
 
     def mark_unsatisfied
-        @direction = Direction.NONE
+        @direction = Direction::NONE
     end
 
     def inputs_known(mark)
@@ -325,13 +320,13 @@ class BinaryConstraint < Constraint
             @v2.remove_constraint(self)
         end
 
-        @direction = Direction.NONE
+        @direction = Direction::NONE
     end
 end
 
 class ScaleConstraint < BinaryConstraint
     def initialize(src, scale, offset, dest, strength)
-        @direction = Direction.NONE
+        @direction = Direction::NONE
         @scale     = scale
         @offset    = offset
         super(src, dest, strength)
@@ -362,7 +357,7 @@ class ScaleConstraint < BinaryConstraint
     end
 
     def execute
-        if @direction == Direction.FORWARD
+        if @direction == Direction::FORWARD
             @v2.value = @v1.value * @scale.value + @offset.value
         else
             @v1.value = (@v2.value - @offset.value) / @scale.value
@@ -395,7 +390,7 @@ class Variable
         @constraints   = []
         @determined_by = nil
         @mark          = 0
-        @walk_strength = Strength.WEAKEST
+        @walk_strength = Strength::WEAKEST
         @stay          = true
     end
 
@@ -592,16 +587,16 @@ def chain_test(n)
     # of course, very low. Typical situations lie somewhere between these
     # two extremes.
 
-    planner = Planner.new
+    $planner = Planner.new
     prev, first, last = nil, nil, nil
 
     # We need to go up to n inclusively.
     for i in 0..(n + 1)
         name = "v%s" % i
-        v = Variable(name)
+        v = Variable.new(name)
 
         unless prev.nil?
-            EqualityConstraint.new(prev, v, Strength.REQUIRED)
+            EqualityConstraint.new(prev, v, Strength::REQUIRED)
         end
 
         if i == 0
@@ -615,11 +610,11 @@ def chain_test(n)
         prev = v
     end
 
-    StayConstraint.new(last, Strength.STRONG_DEFAULT)
-    edit  = EditConstraint.new(first, Strength.PREFERRED)
+    StayConstraint.new(last, Strength::STRONG_DEFAULT)
+    edit  = EditConstraint.new(first, Strength::PREFERRED)
     edits = []
     edits << edit
-    plan = planner.extract_plan_from_constraints(edits)
+    plan = $planner.extract_plan_from_constraints(edits)
 
     for i in 0..100
         first.value = i
@@ -637,7 +632,7 @@ def projection_test(n)
     # time is measured to change a variable on either side of the
     # mapping and to change the scale and offset factors.
 
-    planner = Planner.new
+    $planner = Planner.new
     scale   = Variable("scale", 10)
     offset  = Variable("offset", 1000)
     src, dst = nil, nil
@@ -648,8 +643,8 @@ def projection_test(n)
         src = Variable("src%s" % i, i)
         dst = Variable("dst%s" % i, i)
         dests << dst
-        StayConstraint.new(src, Strength.NORMAL)
-        ScaleConstraint.new(src, scale, offset, dst, Strength.REQUIRED)
+        StayConstraint.new(src, Strength::NORMAL)
+        ScaleConstraint.new(src, scale, offset, dst, Strength::REQUIRED)
     end
 
     change(src, 17)
@@ -683,11 +678,11 @@ end
 
 
 def change(v, new_value)
-    edit = EditConstraint.new(v, Strength.PREFERRED)
+    edit = EditConstraint.new(v, Strength::PREFERRED)
     edits = []
     edits << edit
 
-    plan = planner.extract_plan_from_constraints(edits)
+    plan = $planner.extract_plan_from_constraints(edits)
 
     for i in 0..10
         v.value = new_value
@@ -696,11 +691,6 @@ def change(v, new_value)
 
     edit.destroy_constraint
 end
-
-
-# HOORAY FOR GLOBALS... Oh wait.
-# In spirit of the original, we'll keep it, but ugh.
-planner = nil
 
 
 def delta_blue()
