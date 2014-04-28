@@ -1,642 +1,749 @@
-"""
-deltablue.py
-============
+# Port of deltablue.py, as documented below, to Ruby.
+# Stefan Marr, 2014-04-28
+# 
+# Was: deltablue.py
+# =================
+# 
+# Ported for the PyPy project.
+# Contributed by Daniel Lindsley
+# 
+# This implementation of the DeltaBlue benchmark was directly ported
+# from the `V8's source code`_, which was in turn derived
+# from the Smalltalk implementation by John Maloney and Mario
+# Wolczko. The original Javascript implementation was licensed under the GPL.
+# 
+# It's been updated in places to be more idiomatic to Python (for loops over
+# collections, a couple magic methods, ``OrderedCollection`` being a list & things
+# altering those collections changed to the builtin methods) but largely retains
+# the layout & logic from the original. (Ugh.)
+# 
+# .. _`V8's source code`: (http://code.google.com/p/v8/source/browse/branches/bleeding_edge/benchmarks/deltablue.js)
 
-Ported for the PyPy project.
-Contributed by Daniel Lindsley
+class Strength
+    REQUIRED         = nil
+    STRONG_PREFERRED = nil
+    PREFERRED        = nil
+    STRONG_DEFAULT   = nil
+    NORMAL           = nil
+    WEAK_DEFAULT     = nil
+    WEAKEST          = nil
 
-This implementation of the DeltaBlue benchmark was directly ported
-from the `V8's source code`_, which was in turn derived
-from the Smalltalk implementation by John Maloney and Mario
-Wolczko. The original Javascript implementation was licensed under the GPL.
+    def initialize(strength, name)
+        @strength = strength
+        @name     = name
+    end
 
-It's been updated in places to be more idiomatic to Python (for loops over
-collections, a couple magic methods, ``OrderedCollection`` being a list & things
-altering those collections changed to the builtin methods) but largely retains
-the layout & logic from the original. (Ugh.)
+    def self.stronger(s1, s2)
+        s1.strength < s2.strength
+    end
 
-.. _`V8's source code`: (http://code.google.com/p/v8/source/browse/branches/bleeding_edge/benchmarks/deltablue.js)
+    def self.weaker(s1, s2)
+        s1.strength > s2.strength
+    end
 
-"""
-from __future__ import print_function
-
-
-# The JS variant implements "OrderedCollection", which basically completely
-# overlaps with ``list``. So we'll cheat. :D
-class OrderedCollection(list):
-    pass
-
-
-class Strength(object):
-    REQUIRED = None
-    STRONG_PREFERRED = None
-    PREFERRED = None
-    STRONG_DEFAULT = None
-    NORMAL = None
-    WEAK_DEFAULT = None
-    WEAKEST = None
-
-    def __init__(self, strength, name):
-        super(Strength, self).__init__()
-        self.strength = strength
-        self.name = name
-
-    @classmethod
-    def stronger(cls, s1, s2):
-        return s1.strength < s2.strength
-
-    @classmethod
-    def weaker(cls, s1, s2):
-        return s1.strength > s2.strength
-
-    @classmethod
-    def weakest_of(cls, s1, s2):
-        if cls.weaker(s1, s2):
+    def self.weakest_of(s1, s2)
+        if self.weaker(s1, s2)
             return s1
-
+        end
         return s2
+    end
 
-    @classmethod
-    def strongest(cls, s1, s2):
-        if cls.stronger(s1, s2):
+    def self.strongest(s1, s2)
+        if self.stronger(s1, s2)
             return s1
-
+        end
         return s2
+    end
 
-    def next_weaker(self):
-        strengths = {
-            0: self.__class__.WEAKEST,
-            1: self.__class__.WEAK_DEFAULT,
-            2: self.__class__.NORMAL,
-            3: self.__class__.STRONG_DEFAULT,
-            4: self.__class__.PREFERRED,
-            # TODO: This looks like a bug in the original code. Shouldn't this be
-            #       ``STRONG_PREFERRED? Keeping for porting sake...
-            5: self.__class__.REQUIRED,
-        }
-        return strengths[self.strength]
+    def next_weaker()
+      case @strength
+        when 0
+          WEAKEST
+        when 1
+          WEAK_DEFAULT
+        when 2
+          NORMAL
+        when 3
+          STRONG_DEFAULT
+        when 4
+          PREFERRED
+        when 5
+          # TODO: This looks like a bug in the original code. Shouldn't this be
+          #       ``STRONG_PREFERRED? Keeping for porting sake...
+          REQUIRED
+      end
+    end
+end
 
 
 # This is a terrible pattern IMO, but true to the original JS implementation.
-Strength.REQUIRED = Strength(0, "required")
+Strength.REQUIRED        = Strength(0, "required")
 Strength.STONG_PREFERRED = Strength(1, "strongPreferred")
-Strength.PREFERRED = Strength(2, "preferred")
-Strength.STRONG_DEFAULT = Strength(3, "strongDefault")
-Strength.NORMAL = Strength(4, "normal")
-Strength.WEAK_DEFAULT = Strength(5, "weakDefault")
-Strength.WEAKEST = Strength(6, "weakest")
+Strength.PREFERRED       = Strength(2, "preferred")
+Strength.STRONG_DEFAULT  = Strength(3, "strongDefault")
+Strength.NORMAL          = Strength(4, "normal")
+Strength.WEAK_DEFAULT    = Strength(5, "weakDefault")
+Strength.WEAKEST         = Strength(6, "weakest")
 
 
-class Constraint(object):
-    def __init__(self, strength):
-        super(Constraint, self).__init__()
-        self.strength = strength
+class Constraint
 
-    def add_constraint(self):
-        global planner
-        self.add_to_graph()
+    def initialize(strength)
+        @strength = strength
+    end
+
+    def add_constraint
+        add_to_graph
         planner.incremental_add(self)
+    end
 
-    def satisfy(self, mark):
-        global planner
-        self.choose_method(mark)
+    def satisfy(mark)
+        choose_method(mark)
 
-        if not self.is_satisfied():
-            if self.strength == Strength.REQUIRED:
-                print('Could not satisfy a required constraint!')
+        if not is_satisfied
+            if strength == Strength.REQUIRED
+                puts 'Could not satisfy a required constraint!'
+                return nil
+            end
+        end
 
-            return None
-
-        self.mark_inputs(mark)
-        out = self.output()
+        mark_inputs(mark)
+        out = output
         overridden = out.determined_by
 
-        if overridden is not None:
-            overridden.mark_unsatisfied()
+        unless overridden.nil?:
+            overridden.mark_unsatisfied
+        end
 
         out.determined_by = self
 
-        if not planner.add_propagate(self, mark):
-            print('Cycle encountered')
+        unless planner.add_propagate(self, mark):
+            puts 'Cycle encountered'
+        end
 
         out.mark = mark
-        return overridden
+        overridden
+    end
 
-    def destroy_constraint(self):
-        global planner
-        if self.is_satisfied():
+    def destroy_constraint
+        if is_satisfied:
             planner.incremental_remove(self)
-        else:
-            self.remove_from_graph()
+        else
+            remove_from_graph
+        end
+    end
 
-    def is_input(self):
-        return False
+    def is_input
+        false
+    end
+end
 
+class UnaryConstraint < Constraint
+    def initialize(v, strength)
+        super(strength)
+        @my_output = v
+        @satisfied = false
+        add_constraint
+    end
 
-class UrnaryConstraint(Constraint):
-    def __init__(self, v, strength):
-        super(UrnaryConstraint, self).__init__(strength)
-        self.my_output = v
-        self.satisfied = False
-        self.add_constraint()
+    def add_to_graph
+        @my_output.add_constraint(self)
+        @satisfied = false
+    end
 
-    def add_to_graph(self):
-        self.my_output.add_constraint(self)
-        self.satisfied = False
+    def choose_method(mark)
+        if @my_output.mark != mark and Strength.stronger(@strength, @my_output.walk_strength)
+            @satisfied = true
+        else
+            @satisfied = false
+        end
+    end
 
-    def choose_method(self, mark):
-        if self.my_output.mark != mark and \
-           Strength.stronger(self.strength, self.my_output.walk_strength):
-            self.satisfied = True
-        else:
-            self.satisfied = False
+    def is_satisfied
+        @satisfied
+    end
 
-    def is_satisfied(self):
-        return self.satisfied
-
-    def mark_inputs(self, mark):
+    def mark_inputs(mark)
         # No-ops.
-        pass
+    end
 
-    def output(self):
+    def output
         # Ugh. Keeping it for consistency with the original. So much for
         # "we're all adults here"...
-        return self.my_output
+        @my_output
+    end
 
-    def recalculate(self):
-        self.my_output.walk_strength = self.strength
-        self.my_output.stay = not self.is_input()
+    def recalculate
+        @my_output.walk_strength = @strength
+        @my_output.stay          = !is_input
 
-        if self.my_output.stay:
-            self.execute()
+        if @my_output.stay
+            execute
+        end
+    end
 
-    def mark_unsatisfied(self):
-        self.satisfied = False
+    def mark_unsatisfied
+        @satisfied = false
+    end
 
-    def inputs_known(self, mark):
-        return True
+    def inputs_known(mark)
+        true
+    end
 
-    def remove_from_graph(self):
-        if self.my_output is not None:
-            self.my_output.remove_constraint(self)
-            self.satisfied = False
+    def remove_from_graph
+        unless @my_output.nil?
+            @my_output.remove_constraint(self)
+            @satisfied = false
+        end
+    end
+end
 
-
-class StayConstraint(UrnaryConstraint):
-    def __init__(self, v, string):
-        super(StayConstraint, self).__init__(v, string)
-
-    def execute(self):
+class StayConstraint < UnaryConstraint
+    def execute
         # The methods, THEY DO NOTHING.
-        pass
+    end
+end
 
 
-class EditConstraint(UrnaryConstraint):
-    def __init__(self, v, string):
-        super(EditConstraint, self).__init__(v, string)
+class EditConstraint < UnaryConstraint
+    def is_input
+        true
+    end
 
-    def is_input(self):
-        return True
-
-    def execute(self):
+    def execute
         # This constraint also does nothing.
         pass
+    end
+end
 
 
-class Direction(object):
+class Direction
     # Hooray for things that ought to be structs!
-    NONE = 0
-    FORWARD = 1
+    NONE     = 0
+    FORWARD  = 1
     BACKWARD = -1
+end
 
 
-class BinaryConstraint(Constraint):
-    def __init__(self, v1, v2, strength):
-        super(BinaryConstraint, self).__init__(strength)
-        self.v1 = v1
-        self.v2 = v2
-        self.direction = Direction.NONE
-        self.add_constraint()
+class BinaryConstraint < Constraint
+    def initialize(v1, v2, strength)
+        super(strength)
+        @v1 = v1
+        @v2 = v2
+        @direction = Direction.NONE
+        add_constraint
+    end
 
-    def choose_method(self, mark):
-        if self.v1.mark == mark:
-            if self.v2.mark != mark and Strength.stronger(self.strength, self.v2.walk_strength):
-                self.direction = Direction.FORWARD
-            else:
-                self.direction = Direction.BACKWARD
+    def choose_method(mark)
+        if @v1.mark == mark:
+            if @v2.mark != mark and Strength.stronger(@strength, @v2.walk_strength)
+                @direction = Direction.FORWARD
+            else
+                @direction = Direction.BACKWARD
+            end
+        end
 
-        if self.v2.mark == mark:
-            if self.v1.mark != mark and Strength.stronger(self.strength, self.v1.walk_strength):
-                self.direction = Direction.BACKWARD
-            else:
-                self.direction = Direction.NONE
+        if @v2.mark == mark
+            if @v1.mark != mark and Strength.stronger(@strength, @v1.walk_strength)
+                @direction = Direction.BACKWARD
+            else
+                @direction = Direction.NONE
+            end
+        end
 
-        if Strength.weaker(self.v1.walk_strength, self.v2.walk_strength):
-            if Strength.stronger(self.strength, self.v1.walk_strength):
-                self.direction = Direction.BACKWARD
-            else:
-                self.direction = Direction.NONE
-        else:
+        if Strength.weaker(@v1.walk_strength, @v2.walk_strength)
+            if Strength.stronger(@strength, @v1.walk_strength)
+                @direction = Direction.BACKWARD
+            else
+                @direction = Direction.NONE
+            end
+        else
             if Strength.stronger(self.strength, self.v2.walk_strength):
-                self.direction = Direction.FORWARD
-            else:
-                self.direction = Direction.BACKWARD
+                @direction = Direction.FORWARD
+            else
+                @direction = Direction.BACKWARD
+            end
+        end
+    end
 
-    def add_to_graph(self):
-        self.v1.add_constraint(self)
-        self.v2.add_constraint(self)
-        self.direction = Direction.NONE
+    def add_to_graph
+        @v1.add_constraint(self)
+        @v2.add_constraint(self)
+        @direction = Direction.NONE
+    end
 
-    def is_satisfied(self):
-        return self.direction != Direction.NONE
+    def is_satisfied
+        @direction != Direction.NONE
+    end
 
-    def mark_inputs(self, mark):
-        self.input().mark = mark
+    def mark_inputs(mark)
+        input().mark = mark
+    end
 
-    def input(self):
-        if self.direction == Direction.FORWARD:
-            return self.v1
+    def input
+        if @direction == Direction.FORWARD:
+            return @v1
+        end
 
-        return self.v2
+        @v2
+    end
 
-    def output(self):
-        if self.direction == Direction.FORWARD:
-            return self.v2
+    def output
+        if @direction == Direction.FORWARD:
+            return @v2
+        end
 
-        return self.v1
+        @v1
+    end
 
-    def recalculate(self):
-        ihn = self.input()
-        out = self.output()
-        out.walk_strength = Strength.weakest_of(self.strength, ihn.walk_strength)
+    def recalculate
+        ihn = input()
+        out = output()
+        out.walk_strength = Strength.weakest_of(@strength, ihn.walk_strength)
         out.stay = ihn.stay
 
         if out.stay:
-            self.execute()
+            execute()
+        end
+    end
 
-    def mark_unsatisfied(self):
-        self.direction = Direction.NONE
+    def mark_unsatisfied
+        @direction = Direction.NONE
+    end
 
-    def inputs_known(self, mark):
-        i = self.input()
-        return i.mark == mark or i.stay or i.determined_by == None
+    def inputs_known(mark)
+        i = input()
+        return i.mark == mark or i.stay or i.determined_by == nil
+    end
 
-    def remove_from_graph(self):
-        if self.v1 is not None:
-            self.v1.remove_constraint(self)
+    def remove_from_graph
+        unless @v1.nil?
+            @v1.remove_constraint(self)
+        end
 
-        if self.v2 is not None:
-            self.v2.remove_constraint(self)
+        unless @v2.nil?
+            @v2.remove_constraint(self)
+        end
 
-        self.direction = Direction.NONE
+        @direction = Direction.NONE
+    end
+end
+
+class ScaleConstraint < BinaryConstraint
+    def initialize(src, scale, offset, dest, strength)
+        @direction = Direction.NONE
+        @scale     = scale
+        @offset    = offset
+        super(src, dest, strength)
+    end
+
+    def add_to_graph
+        super
+        @scale.add_constraint(self)
+        @offset.add_constraint(self)
+    end
+
+    def remove_from_graph
+        super
+
+        unless @scale.nil?
+            @scale.remove_constraint(self)
+        end
+
+        unless @offset.nil?
+            @offset.remove_constraint(self)
+        end
+    end
+
+    def mark_inputs(mark)
+        super
+        @scale.mark  = mark
+        @offset.mark = mark
+    end
+
+    def execute
+        if @direction == Direction.FORWARD:
+            @v2.value = @v1.value * @scale.value + @offset.value
+        else
+            @v1.value = (@v2.value - @offset.value) / @scale.value
+        end
+    end
+
+    def recalculate
+        ihn = input
+        out = output
+        out.walk_strength = Strength.weakest_of(@strength, ihn.walk_strength)
+        out.stay = (ihn.stay and @scale.stay and @offset.stay)
+
+        if out.stay
+            execute
+        end
+    end
+end
 
 
-class ScaleConstraint(BinaryConstraint):
-    def __init__(self, src, scale, offset, dest, strength):
-        self.direction = Direction.NONE
-        self.scale = scale
-        self.offset = offset
-        super(ScaleConstraint, self).__init__(src, dest, strength)
+class EqualityConstraint < BinaryConstraint
+    def execute
+        output.value = input.value
+    end
+end
 
-    def add_to_graph(self):
-        super(ScaleConstraint, self).add_to_graph()
-        self.scale.add_constraint(self)
-        self.offset.add_constraint(self)
+class Variable
+    def initialize(name, initial_value = 0)
+        @name          = name
+        @value         = initial_value
+        @constraints   = []
+        @determined_by = nil
+        @mark          = 0
+        @walk_strength = Strength.WEAKEST
+        @stay          = true
+    end
 
-    def remove_from_graph(self):
-        super(ScaleConstraint, self).remove_from_graph()
-
-        if self.scale is not None:
-            self.scale.remove_constraint(self)
-
-        if self.offset is not None:
-            self.offset.remove_constraint(self)
-
-    def mark_inputs(self, mark):
-        super(ScaleConstraint, self).mark_inputs(mark)
-        self.scale.mark = mark
-        self.offset.mark = mark
-
-    def execute(self):
-        if self.direction == Direction.FORWARD:
-            self.v2.value = self.v1.value * self.scale.value + self.offset.value
-        else:
-            self.v1.value = (self.v2.value - self.offset.value) / self.scale.value
-
-    def recalculate(self):
-        ihn = self.input()
-        out = self.output()
-        out.walk_strength = Strength.weakest_of(self.strength, ihn.walk_strength)
-        out.stay = ihn.stay and self.scale.stay and self.offset.stay
-
-        if out.stay:
-            self.execute()
-
-
-class EqualityConstraint(BinaryConstraint):
-    def execute(self):
-        self.output().value = self.input().value
-
-
-class Variable(object):
-    def __init__(self, name, initial_value=0):
-        super(Variable, self).__init__()
-        self.name = name
-        self.value = initial_value
-        self.constraints = OrderedCollection()
-        self.determined_by = None
-        self.mark = 0
-        self.walk_strength = Strength.WEAKEST
-        self.stay = True
-
-    def __repr__(self):
+    def inspect
         # To make debugging this beast from pdb easier...
-        return '<Variable: %s - %s>' % (
-            self.name,
-            self.value
-        )
+        return "<Variable: #{@name} - #{value}>"
+    end
 
-    def add_constraint(self, constraint):
-        self.constraints.append(constraint)
+    def add_constraint(constraint)
+        @constraints << constraint
+    end
 
-    def remove_constraint(self, constraint):
-        self.constraints.remove(constraint)
+    def remove_constraint(constraint)
+        @constraints.delete(constraint)
 
-        if self.determined_by == constraint:
-            self.determined_by = None
+        if @determined_by == constraint
+            @determined_by = nil
+        end
+    end
+end
 
 
-class Planner(object):
-    def __init__(self):
-        super(Planner, self).__init__()
-        self.current_mark = 0
+class Planner
+    def initialize
+        @current_mark = 0
+    end
 
-    def incremental_add(self, constraint):
-        mark = self.new_mark()
+    def incremental_add(constraint)
+        mark = new_mark
         overridden = constraint.satisfy(mark)
 
-        while overridden is not None:
+        until overridden.nil?
             overridden = overridden.satisfy(mark)
+        end
+    end
 
-    def incremental_remove(self, constraint):
-        out = constraint.output()
-        constraint.mark_unsatisfied()
-        constraint.remove_from_graph()
-        unsatisfied = self.remove_propagate_from(out)
-        strength = Strength.REQUIRED
-        # Do-while, the Python way.
-        repeat = True
+    def incremental_remove(constraint)
+        out = constraint.output
+        constraint.mark_unsatisfied
+        constraint.remove_from_graph
+        unsatisfied = remove_propagate_from(out)
+        strength    = Strength.REQUIRED
 
-        while repeat:
+        loop do
             for u in unsatisfied:
-                if u.strength == strength:
-                    self.incremental_add(u)
+                if u.strength == strength
+                    incremental_add(u)
+                end
 
-                strength = strength.next_weaker()
+                strength = strength.next_weaker
+            end
+            break if strength != Strength.WEAKEST
+        end
+    end
 
-            repeat = strength != Strength.WEAKEST
+    def new_mark
+        @current_mark += 1
+        @current_mark
+    end
 
-    def new_mark(self):
-        self.current_mark += 1
-        return self.current_mark
-
-    def make_plan(self, sources):
-        mark = self.new_mark()
+    def make_plan(sources)
+        mark = new_mark
         plan = Plan()
         todo = sources
 
-        while len(todo):
-            c = todo.pop(0)
+        until todo.empty?
+            c = todo.pop
 
-            if c.output().mark != mark and c.inputs_known(mark):
+            if c.output.mark != mark and c.inputs_known(mark)
                 plan.add_constraint(c)
-                c.output().mark = mark
-                self.add_constraints_consuming_to(c.output(), todo)
+                c.output.mark = mark
+                add_constraints_consuming_to(c.output, todo)
+            end
+        end
 
-        return plan
+        plan
+    end
 
-    def extract_plan_from_constraints(self, constraints):
-        sources = OrderedCollection()
+    def extract_plan_from_constraints(constraints)
+        sources = []
 
-        for c in constraints:
-            if c.is_input() and c.is_satisfied():
-                sources.append(c)
+        for c in constraints
+            if c.is_input and c.is_satisfied
+                sources << c
+            end
+        end
 
-        return self.make_plan(sources)
+        make_plan(sources)
+    end
 
-    def add_propagate(self, c, mark):
-        todo = OrderedCollection()
-        todo.append(c)
+    def add_propagate(c, mark)
+        todo = []
+        todo << c
 
-        while len(todo):
-            d = todo.pop(0)
+        until todo.empty?
+            d = todo.pop
 
-            if d.output().mark == mark:
-                self.incremental_remove(c)
-                return False
+            if d.output.mark == mark
+                incremental_remove(c)
+                return false
+            end
 
-            d.recalculate()
-            self.add_constraints_consuming_to(d.output(), todo)
+            d.recalculate
+            add_constraints_consuming_to(d.output, todo)
+        end
 
-        return True
+        true
+    end
 
-    def remove_propagate_from(self, out):
-        out.determined_by = None
+    def remove_propagate_from(out)
+        out.determined_by = nil
         out.walk_strength = Strength.WEAKEST
-        out.stay = True
-        unsatisfied = OrderedCollection()
-        todo = OrderedCollection()
-        todo.append(out)
+        out.stay = true
+        unsatisfied = []
+        todo = []
+        todo << out
 
-        while len(todo):
-            v = todo.pop(0)
+        until todo.empty?
+            v = todo.pop
 
-            for c in v.constraints:
-                if not c.is_satisfied():
-                    unsatisfied.append(c)
+            for c in v.constraints
+                unless c.is_satisfied
+                    unsatisfied << c
+                end
+            end
 
             determining = v.determined_by
 
-            for c in v.constraints:
-                if c != determining and c.is_satisfied():
-                    c.recalculate()
-                    todo.append(c.output())
+            for c in v.constraints
+                if c != determining and c.is_satisfied
+                    c.recalculate
+                    todo << c.output
+                end
+            end
+        end
 
-        return unsatisfied
+        unsatisfied
+    end
 
-    def add_constraints_consuming_to(self, v, coll):
+    def add_constraints_consuming_to(v, coll)
         determining = v.determined_by
         cc = v.constraints
 
-        for c in cc:
-            if c != determining and c.is_satisfied():
+        for c in cc
+            if c != determining and c.is_satisfied
                 # I guess we're just updating a reference (``coll``)? Seems
                 # inconsistent with the rest of the implementation, where they
                 # return the lists...
-                coll.append(c)
+                coll << c
+            end
+        end
+    end
+end
 
 
-class Plan(object):
-    def __init__(self):
-        super(Plan, self).__init__()
-        self.v = OrderedCollection()
+class Plan
+    def initialize
+        @v = []
+    end
 
-    def add_constraint(self, c):
-        self.v.append(c)
+    def add_constraint(c)
+        @v << c
+    end
 
-    def __len__(self):
-        return len(self.v)
+    def size
+        @v.size
+    end
 
-    def __getitem__(self, index):
-        return self.v[index]
+    def [](index)
+        @v[index]
+    end
 
-    def execute(self):
-        for c in self.v:
-            c.execute()
+    def execute
+        for c in @v
+            c.execute
+        end
+    end
+end
 
 
 # Main
 
-def chain_test(n):
-    """
-    This is the standard DeltaBlue benchmark. A long chain of equality
-    constraints is constructed with a stay constraint on one end. An
-    edit constraint is then added to the opposite end and the time is
-    measured for adding and removing this constraint, and extracting
-    and executing a constraint satisfaction plan. There are two cases.
-    In case 1, the added constraint is stronger than the stay
-    constraint and values must propagate down the entire length of the
-    chain. In case 2, the added constraint is weaker than the stay
-    constraint so it cannot be accomodated. The cost in this case is,
-    of course, very low. Typical situations lie somewhere between these
-    two extremes.
-    """
-    global planner
-    planner = Planner()
-    prev, first, last = None, None, None
+def chain_test(n)
+
+    # This is the standard DeltaBlue benchmark. A long chain of equality
+    # constraints is constructed with a stay constraint on one end. An
+    # edit constraint is then added to the opposite end and the time is
+    # measured for adding and removing this constraint, and extracting
+    # and executing a constraint satisfaction plan. There are two cases.
+    # In case 1, the added constraint is stronger than the stay
+    # constraint and values must propagate down the entire length of the
+    # chain. In case 2, the added constraint is weaker than the stay
+    # constraint so it cannot be accomodated. The cost in this case is,
+    # of course, very low. Typical situations lie somewhere between these
+    # two extremes.
+
+    planner = Planner.new
+    prev, first, last = nil, nil, nil
 
     # We need to go up to n inclusively.
-    for i in range(n + 1):
+    for i in 0..(n + 1)
         name = "v%s" % i
         v = Variable(name)
 
-        if prev is not None:
-            EqualityConstraint(prev, v, Strength.REQUIRED)
+        unless prev.nil?
+            EqualityConstraint.new(prev, v, Strength.REQUIRED)
+        end
 
-        if i == 0:
+        if i == 0
             first = v
+        end
 
-        if i == n:
+        if i == n
             last = v
+        end
 
         prev = v
+    end
 
-    StayConstraint(last, Strength.STRONG_DEFAULT)
-    edit = EditConstraint(first, Strength.PREFERRED)
-    edits = OrderedCollection()
-    edits.append(edit)
+    StayConstraint.new(last, Strength.STRONG_DEFAULT)
+    edit  = EditConstraint.new(first, Strength.PREFERRED)
+    edits = []
+    edits << edit
     plan = planner.extract_plan_from_constraints(edits)
 
-    for i in range(100):
+    for i in 0..100
         first.value = i
-        plan.execute()
+        plan.execute
 
         if last.value != i:
-            print("Chain test failed.")
+            puts 'Chain test failed.'
+        end
+    end
+end
 
+def projection_test(n)
+    # This test constructs a two sets of variables related to each
+    # other by a simple linear transformation (scale and offset). The
+    # time is measured to change a variable on either side of the
+    # mapping and to change the scale and offset factors.
 
-def projection_test(n):
-    """
-    This test constructs a two sets of variables related to each
-    other by a simple linear transformation (scale and offset). The
-    time is measured to change a variable on either side of the
-    mapping and to change the scale and offset factors.
-    """
-    global planner
-    planner = Planner()
-    scale = Variable("scale", 10)
-    offset = Variable("offset", 1000)
-    src, dest = None, None
+    planner = Planner.new()
+    scale   = Variable("scale", 10)
+    offset  = Variable("offset", 1000)
+    src, dest = nil, nil
 
-    dests = OrderedCollection()
+    dests = []
 
-    for i in range(n):
+    for i in 0..n:
         src = Variable("src%s" % i, i)
         dst = Variable("dst%s" % i, i)
-        dests.append(dst)
-        StayConstraint(src, Strength.NORMAL)
-        ScaleConstraint(src, scale, offset, dst, Strength.REQUIRED)
+        dests << dst
+        StayConstraint.new(src, Strength.NORMAL)
+        ScaleConstraint.new(src, scale, offset, dst, Strength.REQUIRED)
+    end
 
     change(src, 17)
 
-    if dst.value != 1170:
-        print("Projection 1 failed")
+    if dst.value != 1170
+        puts 'Projection 1 failed'
+    end
 
     change(dst, 1050)
 
-    if src.value != 5:
-        print("Projection 2 failed")
+    if src.value != 5
+        puts 'Projection 2 failed'
+    end
 
     change(scale, 5)
 
-    for i in range(n - 1):
-        if dests[i].value != (i * 5 + 1000):
-            print("Projection 3 failed")
+    for i in 0..(n - 1)
+        if dests[i].value != (i * 5 + 1000)
+            puts 'Projection 3 failed'
+        end
+    end
 
     change(offset, 2000)
 
-    for i in range(n - 1):
-        if dests[i].value != (i * 5 + 2000):
-            print("Projection 4 failed")
+    for i in 0..(n - 1)
+        if dests[i].value != (i * 5 + 2000)
+            puts 'Projection 4 failed'
+        end
+    end
+end
 
 
-def change(v, new_value):
-    global planner
-    edit = EditConstraint(v, Strength.PREFERRED)
-    edits = OrderedCollection()
-    edits.append(edit)
+def change(v, new_value)
+    edit = EditConstraint.new(v, Strength.PREFERRED)
+    edits = []
+    edits << edit
 
     plan = planner.extract_plan_from_constraints(edits)
 
-    for i in range(10):
+    for i in 0..10
         v.value = new_value
-        plan.execute()
+        plan.execute
+    end
 
-    edit.destroy_constraint()
+    edit.destroy_constraint
+end
 
 
 # HOORAY FOR GLOBALS... Oh wait.
 # In spirit of the original, we'll keep it, but ugh.
-planner = None
+planner = nil
 
 
-def delta_blue():
+def delta_blue()
     chain_test(100)
     projection_test(100)
+end
 
-import time
-
-def entry_point(iterations):
-    startTime = time.time()
-
+def run(iterations)
     chain_test(iterations)
     projection_test(iterations)
-    
-    endTime = time.time()
-    return startTime, endTime
+end
 
-if __name__ == '__main__':
-    import sys
-    
-    numIterations = int(sys.argv[1])
-    warmUp        = int(sys.argv[2])
-    innerIter     = int(sys.argv[3])
-    
-    for i in xrange(warmUp):
-        startTime, endTime = entry_point(innerIter)
-                    
-    for i in xrange(numIterations):
-        startTime, endTime = entry_point(innerIter)
-        microseconds = int((endTime - startTime) * 1000 * 1000)
-        print("DeltaBlue: iterations=1 runtime: %dus" % microseconds)
+
+
+iterations   = 100
+warmup       = 0
+innerIter    = 1
+
+if ARGV.size >= 1
+  iterations = ARGV[0].to_i
+end
+
+if ARGV.size >= 2
+  warmup = ARGV[1].to_i
+end
+
+if ARGV.size >= 3
+  innerIter = ARGV[2].to_i
+end
+
+
+puts "Overall iterations: #{iterations}."
+puts "Warmup  iterations: #{warmup}."
+puts "Inner   iterations: #{innerIter}."
+
+warmup.times do
+  run(innerIter)
+end
+
+iterations.times do
+  start   = Time.now
+  run(innerIter)
+  elapsed = (Time.now - start) * 1000.0 * 1000.0
+  puts 'DeltaBlue: iterations=1 runtime: %.0fus' % [elapsed]
+end
 
