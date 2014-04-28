@@ -133,9 +133,9 @@ class Constraint(object):
         return False
 
 
-class UrnaryConstraint(Constraint):
+class UnaryConstraint(Constraint):
     def __init__(self, v, strength):
-        super(UrnaryConstraint, self).__init__(strength)
+        super(UnaryConstraint, self).__init__(strength)
         self.my_output = v
         self.satisfied = False
         self.add_constraint()
@@ -182,7 +182,7 @@ class UrnaryConstraint(Constraint):
             self.satisfied = False
 
 
-class StayConstraint(UrnaryConstraint):
+class StayConstraint(UnaryConstraint):
     def __init__(self, v, string):
         super(StayConstraint, self).__init__(v, string)
 
@@ -191,7 +191,7 @@ class StayConstraint(UrnaryConstraint):
         pass
 
 
-class EditConstraint(UrnaryConstraint):
+class EditConstraint(UnaryConstraint):
     def __init__(self, v, string):
         super(EditConstraint, self).__init__(v, string)
 
@@ -556,7 +556,7 @@ def projection_test(n):
     planner = Planner()
     scale = Variable("scale", 10)
     offset = Variable("offset", 1000)
-    src, dest = None, None
+    src, dst = None, None
 
     dests = OrderedCollection()
 
