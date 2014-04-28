@@ -124,6 +124,6 @@ iterations.times do
   start   = Time.now
   mandelbrot(problem_size)
   elapsed = (Time.now - start) * 1000.0 * 1000.0
-  puts "Mandelbrot: iterations=1 runtime: #{elapsed.to_i}us"
+  puts "Mandelbrot: iterations=1 runtime: %.0fus" % [elapsed]
 end
 
