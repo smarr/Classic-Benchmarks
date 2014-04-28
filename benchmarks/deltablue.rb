@@ -111,13 +111,13 @@ class Constraint
         out = output
         overridden = out.determined_by
 
-        unless overridden.nil?:
+        unless overridden.nil?
             overridden.mark_unsatisfied
         end
 
         out.determined_by = self
 
-        unless planner.add_propagate(self, mark):
+        unless planner.add_propagate(self, mark)
             puts 'Cycle encountered'
         end
 
@@ -126,7 +126,7 @@ class Constraint
     end
 
     def destroy_constraint
-        if is_satisfied:
+        if is_satisfied
             planner.incremental_remove(self)
         else
             remove_from_graph
@@ -235,7 +235,7 @@ class BinaryConstraint < Constraint
     end
 
     def choose_method(mark)
-        if @v1.mark == mark:
+        if @v1.mark == mark
             if @v2.mark != mark and Strength.stronger(@strength, @v2.walk_strength)
                 @direction = Direction.FORWARD
             else
@@ -258,7 +258,7 @@ class BinaryConstraint < Constraint
                 @direction = Direction.NONE
             end
         else
-            if Strength.stronger(self.strength, self.v2.walk_strength):
+            if Strength.stronger(self.strength, self.v2.walk_strength)
                 @direction = Direction.FORWARD
             else
                 @direction = Direction.BACKWARD
@@ -277,11 +277,11 @@ class BinaryConstraint < Constraint
     end
 
     def mark_inputs(mark)
-        input().mark = mark
+        input.mark = mark
     end
 
     def input
-        if @direction == Direction.FORWARD:
+        if @direction == Direction.FORWARD
             return @v1
         end
 
@@ -289,7 +289,7 @@ class BinaryConstraint < Constraint
     end
 
     def output
-        if @direction == Direction.FORWARD:
+        if @direction == Direction.FORWARD
             return @v2
         end
 
@@ -297,13 +297,13 @@ class BinaryConstraint < Constraint
     end
 
     def recalculate
-        ihn = input()
-        out = output()
+        ihn = input
+        out = output
         out.walk_strength = Strength.weakest_of(@strength, ihn.walk_strength)
         out.stay = ihn.stay
 
-        if out.stay:
-            execute()
+        if out.stay
+            execute
         end
     end
 
@@ -312,8 +312,8 @@ class BinaryConstraint < Constraint
     end
 
     def inputs_known(mark)
-        i = input()
-        return i.mark == mark or i.stay or i.determined_by == nil
+        i = input
+        i.mark == mark or i.stay or i.determined_by.nil?
     end
 
     def remove_from_graph
@@ -362,7 +362,7 @@ class ScaleConstraint < BinaryConstraint
     end
 
     def execute
-        if @direction == Direction.FORWARD:
+        if @direction == Direction.FORWARD
             @v2.value = @v1.value * @scale.value + @offset.value
         else
             @v1.value = (@v2.value - @offset.value) / @scale.value
@@ -440,7 +440,7 @@ class Planner
         strength    = Strength.REQUIRED
 
         loop do
-            for u in unsatisfied:
+            for u in unsatisfied
                 if u.strength == strength
                     incremental_add(u)
                 end
@@ -625,7 +625,7 @@ def chain_test(n)
         first.value = i
         plan.execute
 
-        if last.value != i:
+        if last.value != i
             puts 'Chain test failed.'
         end
     end
@@ -637,14 +637,14 @@ def projection_test(n)
     # time is measured to change a variable on either side of the
     # mapping and to change the scale and offset factors.
 
-    planner = Planner.new()
+    planner = Planner.new
     scale   = Variable("scale", 10)
     offset  = Variable("offset", 1000)
-    src, dest = nil, nil
+    src, dst = nil, nil
 
     dests = []
 
-    for i in 0..n:
+    for i in 0..n
         src = Variable("src%s" % i, i)
         dst = Variable("dst%s" % i, i)
         dests << dst
