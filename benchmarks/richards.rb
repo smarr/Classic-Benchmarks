@@ -412,7 +412,7 @@ end
 result = true
 iterations.times do
   start   = Time.now
-  result  = result and run(innerIter)
+  result  = result && run(innerIter)
   elapsed = (Time.now - start) * 1000.0 * 1000.0
   puts "Richards: iterations=1 runtime: %.0fus" % [elapsed]
 end
