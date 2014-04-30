@@ -14,7 +14,7 @@ $layout = 0
 
 def run(iterations)
    s = Scheduler.new 
-   for i in 0..iterations
+   for i in 1..iterations
      s.reset
      s.addIdleTask(IDLE, 0, nil, 10000)
 
