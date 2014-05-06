@@ -44,6 +44,26 @@ local planner
 
 local function alert (...) print(...) end
 
+local function class(super)
+	 local C = {}
+
+	 if super then
+			C.super = super
+			setmetatable(C, super.mt)
+	 end
+
+	 C.mt = { __index = C }
+
+	 function C.new(...)
+			local obj = {}
+			setmetatable(obj, C.mt)
+			C.constructor(obj, ...)
+			return obj
+	 end
+
+	 return C
+end
+
 local OrderedCollection = class()
 
 function OrderedCollection:constructor()
@@ -903,10 +923,60 @@ local function projectionTest(n)
 end
 
 local function deltaBlue()
-	 chainTest(100);
-	 projectionTest(100);
+	 chainTest(100)
+	 projectionTest(100)
 end
 
-DeltaBlue = BenchmarkSuite.new('DeltaBlue', 66118, {
-  Benchmark.new('DeltaBlue', deltaBlue)
-})
+local function run(iterations)
+	chainTest(iterations)
+	projectionTest(iterations)
+end
+
+local ffi = require("ffi")
+ 
+ffi.cdef[[
+  typedef long time_t;
+  typedef struct timeval {
+    time_t tv_sec;
+    time_t tv_usec;
+  } timeval;
+ 
+  int gettimeofday(struct timeval* t, void* tzp);
+]]
+ 
+local function microseconds()
+  local t = ffi.new("timeval")
+  ffi.C.gettimeofday(t, nil)
+  return tonumber(t.tv_sec) * 1000 * 1000 + tonumber(t.tv_usec)
+end
+
+local iterations = 100
+local warmup     = 0
+local innerIter  = 1
+
+if #arg >= 1 then
+	iterations = tonumber(arg[1])
+end
+
+if #arg >= 2 then
+	warmup = tonumber(arg[2])
+end
+
+if #arg >= 3 then
+	innerIter = tonumber(arg[3])
+end
+
+print("Overall iterations:", iterations)
+print("Warmup  iterations:", warmup)
+print("Inner   iterations:", innerIter)
+
+for i = 1, warmup do
+	run(innerIter)
+end
+
+for i = 1, iterations do
+	local start = microseconds()
+	run(innerIter)
+	local elapsed = microseconds() - start
+	print(string.format("DeltaBlue: iterations=1 runtime: %dus", elapsed))
+end

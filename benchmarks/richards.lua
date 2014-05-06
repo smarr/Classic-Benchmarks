@@ -280,7 +280,6 @@ end
 
 local function main(loops)
   if tracing then print("Benchmark starting") end
-  local t1 = os.clock()
   for i = 1,loops do
     qpktcount = 0
     holdcount = 0
@@ -304,7 +303,7 @@ local function main(loops)
       devb = devb:tick()
     end
     local results
-    if qpktcount == QPKTCOUNT and holdcount == HOLDCOUNT then
+    if qpktcount == QPKTCOUNT or holdcount == HOLDCOUNT then
       results = "correct"
     else
       results = "incorrect"
@@ -314,12 +313,60 @@ local function main(loops)
     end
     if tracing then print("\nend of run") end
   end
-  local t2 = os.clock()
-  local delta = t2 - t1
-  return delta
+  return results
 end
 
-loops = tonumber(arg and arg[1]) or 10
-delta = main(loops)
-if tracing then io.write("Time (in seconds): ") end
-print(delta)
+
+
+local ffi = require("ffi")
+ 
+ffi.cdef[[
+  typedef long time_t;
+  typedef struct timeval {
+    time_t tv_sec;
+    time_t tv_usec;
+  } timeval;
+ 
+  int gettimeofday(struct timeval* t, void* tzp);
+]]
+ 
+local function microseconds()
+  local t = ffi.new("timeval")
+  ffi.C.gettimeofday(t, nil)
+  return tonumber(t.tv_sec) * 1000 * 1000 + tonumber(t.tv_usec)
+end
+
+local iterations = 100
+local warmup     = 0
+local innerIter  = 1
+
+if #arg >= 1 then
+	iterations = tonumber(arg[1])
+end
+
+if #arg >= 2 then
+	warmup = tonumber(arg[2])
+end
+
+if #arg >= 3 then
+	innerIter = tonumber(arg[3])
+end
+
+print("Overall iterations:", iterations)
+print("Warmup  iterations:", warmup)
+print("Inner   iterations:", innerIter)
+
+for i = 1, warmup do
+	main(innerIter)
+end
+
+for i = 1, iterations do
+	local start = microseconds()
+	if "incorrect" == main(innerIter) then
+		os.exit(1)
+	end
+	local elapsed = microseconds() - start
+	print(string.format("Richards: iterations=1 runtime: %dus", elapsed))
+end
+
+
