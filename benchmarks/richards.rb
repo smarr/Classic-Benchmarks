@@ -65,6 +65,8 @@ class Scheduler
    end   
    
    def reset()
+      @table = Array.new(MAXTASKS,nil)
+      @list = nil 
       @queueCount = 0
       @holdCount = 0
    end
