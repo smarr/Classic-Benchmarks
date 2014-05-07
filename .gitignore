@@ -1,7 +1,5 @@
 *.class
-deltablue-c
-mandelbrot-c
-richards-c
+*-c
 
 vms_experiment_repo/abbrev.aux
 vms_experiment_repo/abbrev.tex
