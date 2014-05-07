@@ -116,19 +116,31 @@ class Mandelbrot {
           throw new RuntimeException();
       }
 
-      int problemSize = 1000;
       int iterations = 100;
+      int warmup     = 0;
+      int problemSize = 1000;
+
 
       if (args.length >= 1) {
-          problemSize = Integer.parseInt(args[0]);
+          iterations = Integer.parseInt(args[0]);
       }
-      
+
       if (args.length >= 2) {
-          iterations = Integer.parseInt(args[1]);
+          warmup = Integer.parseInt(args[1]);
       }
-      
-      System.out.println("Mandelbrot problem size set to: " + problemSize);
+
+      if (args.length >= 3) {
+          problemSize = Integer.parseInt(args[2]);
+      }
+
       System.out.println("Overall iterations: " + iterations);
+      System.out.println("Warmup  iterations: " + warmup);
+      System.out.println("Problem size:       " + problemSize);
+
+      while (warmup > 0) {
+        mandelbrot(problemSize);
+        warmup--;
+      }
 
       while (iterations > 0) {
          long start = System.nanoTime();
