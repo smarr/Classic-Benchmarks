@@ -96,16 +96,36 @@ def fannkuch(n)
   end
 end
 
-def warmup
-  1000000.times do
-    fannkuch(4)
-  end
+iterations   = 100
+warmup       = 0
+problemSize  = 8
+
+if ARGV.size >= 1
+  iterations = ARGV[0].to_i
 end
 
-def sample
-  fannkuch(9) == 8629
+if ARGV.size >= 2
+  warmup = ARGV[1].to_i
 end
 
-def name
-  return "shootout-fannkuch-redux"
+if ARGV.size >= 3
+  problemSize = ARGV[2].to_i
+end
+
+
+warmup.times do
+  fannkuch(problemSize)
+end
+
+
+if not (fannkuch(9) == 8629)
+  puts "fannkuch(9) failed, gave incorrect result"
+  exit 1
+end
+
+iterations.times do
+  start   = Time.now
+  fannkuch(problemSize)
+  elapsed = (Time.now - start) * 1000.0 * 1000.0
+  puts 'Fannkuch: iterations=1 runtime: %.0fus' % [elapsed]
 end
