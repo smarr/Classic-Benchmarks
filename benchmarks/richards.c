@@ -20,7 +20,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
+
+#include "harness.h"
 
 #ifdef bench100
 #define                Count           10000*100
@@ -398,12 +399,6 @@ int bench() {
     return qpktcount;
 }
 
-unsigned long microseconds() {
-    // Not monotonic
-    struct timeval t;
-    gettimeofday(&t, NULL);
-    return (t.tv_sec * 1000 * 1000) + t.tv_usec;
-}
 
 int inner_loop(int inner) {
     int r = 0;
@@ -416,20 +411,12 @@ int inner_loop(int inner) {
 
 int main(int argc, char* argv[])
 {
-    int inner_iterations = 10;
-    
-    if (argc > 1) {
-        inner_iterations = atoi(argv[1]);
-    }
-    
     int iterations = 100;
-    if (argc > 2) {
-        iterations = atoi(argv[2]);
-    }
-    
-    printf("Richards problem size (inner iterations) set to: %d.\n", inner_iterations);
-    printf("Overall iterations: %d.\n", iterations);
-    
+    int warmup     = 0;
+    int inner_iterations = 100;
+
+    parse_argv(argc, argv, &iterations, &warmup, &inner_iterations);
+
     int result = 0;
     while (iterations > 0) {
         unsigned long start = microseconds();

@@ -10,7 +10,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include <sys/time.h>
+
+#include "harness.h"
 
 typedef enum {false, true} Boolean;
 typedef	void (*Proc)();
@@ -1075,30 +1076,14 @@ void ProjectionTest(int n)
   List_Destroy(dests);
 }
 
-unsigned long microseconds() {
-  // Not monotonic
-  struct timeval t;
-  gettimeofday(&t, NULL);
-  return (t.tv_sec * 1000 * 1000) + t.tv_usec;
-}
-
-
 int main(int argc, char* argv[])
-{  
+{
+  int iterations = 100;
+  int warmup     = 0;
   int inner_iterations = 1000;
 
-  if (argc > 1) {
-    inner_iterations = atoi(argv[1]);
-  }
+  parse_argv(argc, argv, &iterations, &warmup, &inner_iterations);
 
-  int iterations = 100;
-  if (argc > 2) {
-    iterations = atoi(argv[2]);
-  }
-  
-  printf("DeltaBlue problem size (inner iterations) set to: %d.\n", inner_iterations);
-  printf("Overall iterations: %d.\n", iterations);
-  
   while (iterations > 0) {
     unsigned long start = microseconds();
     ChainTest(inner_iterations);
