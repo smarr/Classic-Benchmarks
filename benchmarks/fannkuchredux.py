@@ -47,10 +47,42 @@ def fannkuch(n):
             else:
                 r = nm
                 if not count[r]:
-                    print( checksum )
-                    return maxFlipsCount
+                    return checksum
             count[r] -= 1
-from sys import argv
-n = int(argv[1])
 
-print(( "Pfannkuchen(%i) = %i" % (n, fannkuch(n)) ))
+import sys, time
+
+def microseconds():
+    return time.time() * 1000 * 1000
+
+
+
+iterations   = 100
+warmup       = 0
+problem_size = 1000
+
+if len(sys.argv) > 1:
+    iterations = int(sys.argv[1])
+
+if len(sys.argv) > 2:
+    warmup = int(sys.argv[2])
+
+if len(sys.argv) > 3:
+    problem_size = int(sys.argv[3])
+
+print "Overall iterations: %d." % iterations
+print "Warmup  iterations: %d." % warmup
+print "Problem size:       %d." % problem_size
+
+for i in xrange(0, warmup):
+    fannkuch(problem_size)
+
+if fannkuch(9) != 8629:
+    print "Sanity check failed! Fannkuch gives wrong result"
+    sys.exit(1)
+
+for i in xrange(0, iterations):
+    start = microseconds()
+    fannkuch(problem_size)
+    elapsed = microseconds() - start
+    print "Fannkuch: iterations=1 runtime: %dus" % elapsed
