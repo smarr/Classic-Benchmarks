@@ -317,44 +317,9 @@ local function main(loops)
 end
 
 
+local microseconds, parse_args = dofile("harness.lua")
+local iterations, warmup, innerIter = parse_args(arg, 100, 0, 1)
 
-local ffi = require("ffi")
- 
-ffi.cdef[[
-  typedef long time_t;
-  typedef struct timeval {
-    time_t tv_sec;
-    time_t tv_usec;
-  } timeval;
- 
-  int gettimeofday(struct timeval* t, void* tzp);
-]]
- 
-local function microseconds()
-  local t = ffi.new("timeval")
-  ffi.C.gettimeofday(t, nil)
-  return tonumber(t.tv_sec) * 1000 * 1000 + tonumber(t.tv_usec)
-end
-
-local iterations = 100
-local warmup     = 0
-local innerIter  = 1
-
-if #arg >= 1 then
-	iterations = tonumber(arg[1])
-end
-
-if #arg >= 2 then
-	warmup = tonumber(arg[2])
-end
-
-if #arg >= 3 then
-	innerIter = tonumber(arg[3])
-end
-
-print("Overall iterations:", iterations)
-print("Warmup  iterations:", warmup)
-print("Inner   iterations:", innerIter)
 
 for i = 1, warmup do
 	main(innerIter)
