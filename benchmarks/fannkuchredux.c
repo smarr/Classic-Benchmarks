@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "harness.h"
+
 /* this depends highly on the platform.  It might be faster to use
    char type on 32-bit systems; it might be faster to use unsigned. */
 
@@ -17,12 +19,7 @@ typedef int elem;
 
 elem s[16], t[16];
 
-int maxflips = 0;
-int max_n;
-int odd = 0;
-int checksum = 0;
-
-int flip()
+int flip(int max_n)
 {
    register int i;
    register elem *x, *y, c;
@@ -38,7 +35,7 @@ int flip()
    return i;
 }
 
-inline void rotate(int n)
+static inline void rotate(int n)
 {
    elem c;
    register int i;
@@ -48,8 +45,11 @@ inline void rotate(int n)
 }
 
 /* Tompkin-Paige iterative perm generation */
-void tk(int n)
+int tk(int n)
 {
+   int checksum = 0;
+   int odd = 0;
+   int maxflips = 0;
    int i = 0, f;
    elem c[16] = {0};
 
@@ -64,32 +64,52 @@ void tk(int n)
       i = 1;
       odd = ~odd;
       if (*s) {
-         f = s[s[0]] ? flip() : 1;
+         f = s[s[0]] ? flip(n) : 1;
          if (f > maxflips) maxflips = f;
          checksum += odd ? -f : f;
       }
    }
+   return checksum;
 }
 
-int main(int argc, char **v)
+int fannkuch(int max_n) {
+  for (int i = 0; i < max_n; i++) {
+    s[i] = i;
+  }
+  return tk(max_n);
+}
+
+void sample() {
+  int r = fannkuch(9);
+  if (r != 8629) {
+    printf("Fannkuch(9) failed, delivers unexpected result: %d\n", r);
+    abort();
+  }
+}
+
+int main(int argc, char **argv)
 {
-   int i;
+   int iterations = 100;
+   int warmup     = 0;
+   int problem_size = 9;
 
-   if (argc < 2) {
-      fprintf(stderr, "usage: %s number\n", v[0]);
+   parse_argv(argc, argv, &iterations, &warmup, &problem_size);
+
+   if (problem_size < 3 || problem_size > 15) {
+      fprintf(stderr, "problem_size range: must be 3 <= n <= 12\n");
       exit(1);
    }
 
-   max_n = atoi(v[1]);
-   if (max_n < 3 || max_n > 15) {
-      fprintf(stderr, "range: must be 3 <= n <= 12\n");
-      exit(1);
+   sample();
+
+   int result = 0;
+   while (iterations > 0) {
+     unsigned long start = microseconds();
+     result += fannkuch(problem_size);
+     unsigned long elapsed = microseconds() - start;
+     printf("Fannkuch: iterations=1 runtime: %lu%s\n", elapsed, "us");
+     iterations--;
    }
-
-   for (i = 0; i < max_n; i++) s[i] = i;
-   tk(max_n);
-
-   printf("%d\nPfannkuchen(%d) = %d\n", checksum, max_n, maxflips);
 
    return 0;
 }
