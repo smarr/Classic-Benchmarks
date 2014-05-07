@@ -25,7 +25,7 @@ richards-c: benchmarks/richards.c
 	$(CC) -O3 $^ -o $@
 
 fannkuch-c: benchmarks/fannkuchredux.c
-	$(CC) -O3 $^ -o $@
+	$(CC) -std=c11 -O3 $^ -o $@
 
 clean:
 	@-rm *.class
