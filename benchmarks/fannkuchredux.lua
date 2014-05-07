@@ -43,6 +43,24 @@ local function fannkuch(n)
   until false
 end
 
-local n = tonumber(arg and arg[1]) or 1
-local sum, flips = fannkuch(n)
-io.write(sum, "\nPfannkuchen(", n, ") = ", flips, "\n")
+local microseconds, parse_args = dofile("harness.lua")
+local iterations, warmup, problemSize = parse_args(arg, 100, 0, 1)
+
+local sum, flips = 0
+
+for i = 1, warmup do
+  sum, flips = fannkuch(problemSize)
+end
+
+sum, flips = fannkuch(9)
+if sum ~= 8629 then
+  print("fannkuch(9) failed, it delivered a wrong checksum value:", sum)
+  os.exit(1)
+end
+
+for i = 1, iterations do
+  local start = microseconds()
+  sum, flips = fannkuch(problemSize)
+  local elapsed = microseconds() - start
+  print(string.format("Fannkuch: iterations=1 runtime: %dus", elapsed))
+end
