@@ -116,7 +116,7 @@ if ARGV.size >= 2
 end
 
 if ARGV.size >= 3
-  problem_size = ARGV[1].to_i
+  problem_size = ARGV[2].to_i
 end
 
 puts "Overall iterations: #{iterations}."
