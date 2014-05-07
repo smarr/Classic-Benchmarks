@@ -50,19 +50,19 @@ local function mandelbrot(size)
   local sum      = 0
   local byte_acc = 0
   local bit_num  = 0
-  
+
   for y = 0, size - 1 do
     local ci = (2.0 * y / size) - 1.0
-    
+
     for x = 0, size - 1 do
       local zrzr = 0.0
       local zr   = 0.0
       local zizi = 0.0
       local zi   = 0.0
-      
+
       local cr = (2.0 * x / size) - 1.5
       local escape = 1
-      
+
       for z = 1, 50 do
         local tr = zrzr - zizi + cr
         local ti = 2.0 * zr * zi + ci
@@ -77,10 +77,10 @@ local function mandelbrot(size)
           break
         end
       end
-      
+
       byte_acc = bor(lshift(byte_acc, 1), escape)
       bit_num  = bit_num + 1
-      
+
       -- Code is very similar for these cases, but using separate blocks
       -- ensures we skip the shifting when it's unnecessary, which is
       -- most cases.
@@ -96,7 +96,7 @@ local function mandelbrot(size)
       end
     end
   end
-  
+
   return sum
 end
 

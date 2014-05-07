@@ -233,13 +233,13 @@ local function fn_handler(self, pkt)
   local v2 = self.v2
   if pkt then
     if pkt.kind == "work" then
-      if v1 then append(pkt, v1) else 
+      if v1 then append(pkt, v1) else
 	v1 = append(pkt, v1)
 	self.v1 = v1
       end
     else
-      if v2 then append(pkt, v2) else 
-	v2 = append(pkt, v2) 
+      if v2 then append(pkt, v2) else
+	v2 = append(pkt, v2)
 	self.v2 = v2
       end
     end
@@ -368,5 +368,3 @@ for i = 1, iterations do
 	local elapsed = microseconds() - start
 	print(string.format("Richards: iterations=1 runtime: %dus", elapsed))
 end
-
-

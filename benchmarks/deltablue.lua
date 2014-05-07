@@ -326,7 +326,7 @@ end
 local StayConstraint = class(UnaryConstraint)
 
 function StayConstraint:constructor(v, str)
-	 StayConstraint.super.constructor(self, v, str) 
+	 StayConstraint.super.constructor(self, v, str)
 end
 
 function StayConstraint:execute ()
@@ -473,7 +473,7 @@ end
 
 --
 -- S c a l e   C o n s t r a i n t
--- 
+--
 
 --
 -- Relates two variables by the linear scaling relationship: "v2 =
