@@ -102,18 +102,25 @@ if not sample():
     print "Sanity check failed! Mandelbrot gives wrong result"
     sys.exit(1)
 
-problem_size = 1000
 iterations   = 100
+warmup       = 0
+problem_size = 1000
 
 if len(sys.argv) > 1:
-    problem_size = int(sys.argv[1])
+    iterations = int(sys.argv[1])
 
 if len(sys.argv) > 2:
-    iterations = int(sys.argv[2])
+    warmup = int(sys.argv[2])
 
-print "Mandelbrot problem size set to: %d." % problem_size
+if len(sys.argv) > 3:
+    problem_size = int(sys.argv[3])
+
 print "Overall iterations: %d." % iterations
+print "Warmup  iterations: %d." % warmup
+print "Problem size:       %d." % problem_size
 
+for i in xrange(0, warmup):
+    mandelbrot(problem_size)
 
 for i in xrange(0, iterations):
     start = microseconds()
