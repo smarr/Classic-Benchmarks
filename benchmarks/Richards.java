@@ -112,6 +112,11 @@ public class Richards {
 	}
 
 	private static int benchmark() {
+    // reset everything
+    tasktab = new Tasktab(11);
+    tasklist = null;
+    qpktcount = holdcount = 0;
+
 		Packet wkq = null;
 
 		// System.out.println("Bench mark starting");
@@ -140,8 +145,6 @@ public class Richards {
 		new DevTask(I_DEVB, 5000, wkq, S_WAIT, 0, 0);
 
 		tcb = tasklist;
-
-		qpktcount = holdcount = 0;
 
 //		System.out.println("Starting");
 
