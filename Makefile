@@ -1,6 +1,6 @@
 #!/usr/bin/env make -f
 
-all: DeltaBlue.class Mandelbrot.class Richards.class \
+all: DeltaBlue.class Mandelbrot.class Richards.class fannkuchredux.class \
 	 mandelbrot-c deltablue-c richards-c fannkuch-c
 
 DeltaBlue.class: benchmarks/DeltaBlue.java
@@ -10,6 +10,9 @@ Mandelbrot.class: benchmarks/Mandelbrot.java
 	javac -d . $^
 
 Richards.class: benchmarks/Richards.java
+	javac -d . $^
+
+fannkuchredux.class: benchmarks/fannkuchredux.java
 	javac -d . $^
 
 mandelbrot-c: benchmarks/mandelbrot.c
