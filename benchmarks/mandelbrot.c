@@ -1,13 +1,13 @@
 // Copyright © 2004-2013 Brent Fulgham
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
-// 
+//
 //   * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
-// 
+//
 //   * Redistributions in binary form must reproduce the above copyright notice,
 //     this list of conditions and the following disclaimer in the documentation
 //     and/or other materials provided with the distribution.
@@ -16,7 +16,7 @@
 //     of "The Computer Language Shootout Benchmarks" nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -30,7 +30,7 @@
 
 // The Computer Language Benchmarks Game
 // http://benchmarksgame.alioth.debian.org
-// 
+//
 //  contributed by Karl von Laudermann
 //  modified by Jeremy Echols
 //  modified by Detlef Reichl
@@ -142,12 +142,10 @@ int main(int argc, char** argv) {
      printf("Mandelbrot: iterations=1 runtime: %lu%s\n", elapsed, "us");
      iterations--;
   }
-  
+
   if (result == 0) {
     return 1;
   } else {
     return 0;
   }
 }
-
-

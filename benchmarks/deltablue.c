@@ -196,7 +196,7 @@ void List_Remove(List list, Element element)
   Element *srcPtr = &list->slots[list->first];
   Element *destPtr = &list->slots[0];
   Element *lastPtr = &list->slots[list->last];
-    
+
   list->last = list->last - list->first;
   list->first = 0;
   while (srcPtr <= lastPtr) {
@@ -334,7 +334,7 @@ Constraint Constraint_Create(int variableCount, Strength strength)
 {
   Constraint new;
   int i;
-  
+
   new = (Constraint) malloc(sizeof(ConstraintStruct)
 			    + ((variableCount - 1) * sizeof(Variable)));
   if (new == NULL) Error("out of memory");
@@ -365,7 +365,7 @@ void Constraint_Destroy(Constraint c)
 void Constraint_Print(Constraint c)
 {
   int i, outIndex;
-  
+
   if (!SATISFIED(c)) {
     printf("Unsatisfied(");
     for (i = 0; i < c->varCount; i++) {
@@ -394,7 +394,7 @@ void Constraint_Print(Constraint c)
 char* StrengthString(Strength strength)
 {
   static char temp[20];
-  
+
   switch (strength) {
   case S_required:		return "required";
   case S_strongPreferred:	return "strongPreferred";
@@ -471,7 +471,7 @@ void FreeVariable(Variable v)
 {
   Constraint c;
   int i;
-  
+
   c = (Constraint) List_RemoveFirst(v->constraints);
   while (c != NULL) {
     for (i = c->varCount - 1; i >= 0; i--) {
@@ -508,7 +508,7 @@ void DestroyVariable(Variable v)
 void AddConstraint(Constraint c)
 {
   int i;
-  
+
   for (i = c->varCount - 1; i >= 0; i--) {
     List_Add((c->variables[i])->constraints, (Element) c);
   }
@@ -784,7 +784,7 @@ int OutputWalkStrength(Constraint c)
 Boolean ConstantOutput(Constraint c)
 {
   int outIndex, i;
-  
+
   if (c->inputFlag) return false;
   outIndex = c->methodOuts[c->whichMethod];
   for (i = c->varCount - 1; i >= 0; i--) {
@@ -799,7 +799,7 @@ Boolean ConstantOutput(Constraint c)
 
 void NewMark(void)
 {
-    currentMark++; 
+    currentMark++;
 }
 
 Constraint NextDownstreamConstraint(List todo, Variable variable)
@@ -831,7 +831,7 @@ Constraint NextDownstreamConstraint(List todo, Variable variable)
   a constraint on the argument variables.
   */
 
- 
+
 /* macro to reference a constraint variable value */
 #define var(i) ((c->variables[i])->value)
 
@@ -975,7 +975,7 @@ void ChainTest(int n)
   Variable	prev, v, first, last;
   Constraint	editC;
   List		plan;
-  
+
   InitDeltaBlue();
   prev = first = last = NULL;
 
@@ -1033,13 +1033,13 @@ void ProjectionTest(int n)
   long 	msecs, i;
   char	name[20];
   List dests;
-  
+
   InitDeltaBlue();
-  
+
   scale = Variable_Create("scale", 10);
   offset = Variable_Create("offset", 1000);
   dests = List_Create(n);
-  
+
   for (i = 1; i <= n; i++) {
     /* make src and dest variables */
     sprintf(name, "src%ld", i);
@@ -1047,10 +1047,10 @@ void ProjectionTest(int n)
     sprintf(name, "dest%ld", i);
     dest = Variable_Create(name, i);
     List_Add(dests, dest);
-    
+
     /* add stay on src */
     StayC(src, S_default);
-    
+
     /* add scale/offset constraint */
     ScaleOffsetC(src, scale, offset, dest, S_required);
   }
