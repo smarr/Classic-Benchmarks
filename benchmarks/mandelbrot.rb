@@ -101,24 +101,37 @@ def sample
   mandelbrot(750) == 192
 end
 
+
+iterations   = 100
+warmup       = 0
+problem_size = 1000
+
+
+if ARGV.size >= 1
+  iterations = ARGV[0].to_i
+end
+
+if ARGV.size >= 2
+  warmup = ARGV[1].to_i
+end
+
+if ARGV.size >= 3
+  problem_size = ARGV[1].to_i
+end
+
+puts "Overall iterations: #{iterations}."
+puts "Warmup  iterations: #{warmup}."
+puts "Problem size:       #{problem_size}."
+
+warmup.times do
+  mandelbrot(problem_size)
+end
+
 if not sample
   puts "Sanity check failed! Mandelbrot gives wrong result"
   exit 1
 end
 
-problem_size = 1000
-iterations   = 100
-
-if ARGV.size >= 1
-  problem_size = ARGV[0].to_i
-end
-
-if ARGV.size >= 2
-  iterations = ARGV[1].to_i
-end
-
-puts "Mandelbrot problem size set to: #{problem_size}."
-puts "Overall iterations: #{iterations}."
 
 iterations.times do
   start   = Time.now
@@ -126,4 +139,3 @@ iterations.times do
   elapsed = (Time.now - start) * 1000.0 * 1000.0
   puts "Mandelbrot: iterations=1 runtime: %.0fus" % [elapsed]
 end
-
