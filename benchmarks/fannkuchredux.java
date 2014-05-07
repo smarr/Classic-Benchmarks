@@ -40,9 +40,8 @@ public class fannkuchredux
          // Use incremental change to generate another permutation
          while (true) {
             if (r == n) {
-	       System.out.println( checksum );
-	       return maxFlipsCount;
-	    }
+	             return checksum;
+	          }
             int perm0 = perm1[0];
             int i = 0;
             while (i < r) {
@@ -62,8 +61,26 @@ public class fannkuchredux
    }
 
    public static void main(String[] args){
-      int n = 7;
-      if (args.length > 0) n = Integer.parseInt(args[0]);
-      System.out.println("Pfannkuchen("+n+") = "+fannkuch(n));
+      int numIterations = Integer.valueOf(args[0]);
+      int warmUp        = Integer.valueOf(args[1]);
+      int problemSize   = Integer.valueOf(args[2]);
+
+      if (fannkuch(9) != 8629) {
+        System.err.println("fannkuch(9) failed, gave unexpected result.");
+        System.exit(1);
+      }
+
+      for (int i = 0; i < warmUp; i++) {
+        fannkuch(problemSize);
+      }
+
+      int result = 0;
+      for (int i = 0; i < numIterations; i++) {
+        long start = System.nanoTime();
+        result += fannkuch(problemSize);
+        long end = System.nanoTime();
+        long microseconds = (end - start) / 1000;
+        System.out.println("Fannkuch: iterations=1 runtime: " + microseconds + "us");
+      }
    }
 }
