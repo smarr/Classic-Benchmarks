@@ -1,27 +1,14 @@
 #!/usr/bin/env make -f
+# We only need javac, often enough, it is going to be linked at /usr/bin/javac
+JAVA_HOME?=/usr
 
 all: DeltaBlue.class Mandelbrot.class Richards.class fannkuchredux.class \
 	 mandelbrot-c deltablue-c richards-c fannkuch-c
 
-DeltaBlue.class: benchmarks/DeltaBlue.java
-	javac -d . $^
+%.class: benchmarks/%.java
+	$(JAVA_HOME)/bin/javac -d . $^
 
-Mandelbrot.class: benchmarks/Mandelbrot.java
-	javac -d . $^
-
-Richards.class: benchmarks/Richards.java
-	javac -d . $^
-
-fannkuchredux.class: benchmarks/fannkuchredux.java
-	javac -d . $^
-
-mandelbrot-c: benchmarks/mandelbrot.c
-	$(CC) -O3 $^ -o $@
-
-deltablue-c: benchmarks/deltablue.c
-	$(CC) -O3 $^ -o $@
-
-richards-c: benchmarks/richards.c
+%-c: benchmarks/%.c
 	$(CC) -O3 $^ -o $@
 
 fannkuch-c: benchmarks/fannkuchredux.c
