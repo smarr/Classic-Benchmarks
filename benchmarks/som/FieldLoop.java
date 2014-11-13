@@ -49,4 +49,7 @@ public class FieldLoop extends Benchmark {
 		return counter;
 	}
 
+	public static void main(String[] args) {
+		new FieldLoop().run(args);
+	}
 }
