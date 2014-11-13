@@ -10,15 +10,32 @@
 
 */
 
-public final class nbody {
+public final class NBody {
     public static void main(String[] args) {
-        int n = Integer.parseInt(args[0]);
-
+    	int numIterations = Integer.valueOf(args[0]);
+        int warmUp        = Integer.valueOf(args[1]);
+        int problemSize   = Integer.valueOf(args[2]);
+        
         NBodySystem bodies = new NBodySystem();
-        System.out.printf("%.9f\n", bodies.energy());
-        for (int i=0; i<n; ++i)
-           bodies.advance(0.01);
-        System.out.printf("%.9f\n", bodies.energy());
+        for (int i = 0; i < warmUp; i++) {
+            innerLoop(bodies, problemSize);
+        }
+
+        for (int i = 0; i < numIterations; i++) {
+        	long start = System.nanoTime();
+        	
+        	bodies = new NBodySystem();
+            innerLoop(bodies, problemSize);
+            
+            long end = System.nanoTime();
+            long microseconds = (end - start) / 1000;
+            System.out.println("NBody: iterations=1 runtime: " + microseconds + "us");
+        }
+    }
+    
+    private static void innerLoop(NBodySystem bodies, int inner) {
+    	for (int i=0; i < inner; ++i)
+            bodies.advance(0.01);
     }
 }
 

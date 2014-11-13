@@ -2,7 +2,7 @@
 # We only need javac, often enough, it is going to be linked at /usr/bin/javac
 JAVA_HOME?=/usr
 
-CLASSIC_JAVA=DeltaBlue.class Mandelbrot.class Richards.class fannkuchredux.class
+CLASSIC_JAVA=DeltaBlue.class Mandelbrot.class Richards.class fannkuchredux.class NBody.class
 CLASSIC_C=mandelbrot-c deltablue-c richards-c fannkuch-c
 
 SOM_JAVA= som \
