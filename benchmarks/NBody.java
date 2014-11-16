@@ -12,7 +12,7 @@
 
 public final class NBody {
     public static void main(String[] args) {
-    	int numIterations = Integer.valueOf(args[0]);
+      int numIterations = Integer.valueOf(args[0]);
         int warmUp        = Integer.valueOf(args[1]);
         int problemSize   = Integer.valueOf(args[2]);
         
@@ -22,9 +22,9 @@ public final class NBody {
         }
 
         for (int i = 0; i < numIterations; i++) {
-        	long start = System.nanoTime();
-        	
-        	bodies = new NBodySystem();
+          long start = System.nanoTime();
+          
+          bodies = new NBodySystem();
             innerLoop(bodies, problemSize);
             
             long end = System.nanoTime();
@@ -34,7 +34,7 @@ public final class NBody {
     }
     
     private static void innerLoop(NBodySystem bodies, int inner) {
-    	for (int i=0; i < inner; ++i)
+      for (int i=0; i < inner; ++i)
             bodies.advance(0.01);
     }
 }
