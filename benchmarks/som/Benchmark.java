@@ -11,7 +11,7 @@ public abstract class Benchmark {
     try {
       runWithError(args);
     } catch (RuntimeException e) {
-      System.err.println(e.toString());
+      e.printStackTrace();
       System.exit(1);
     }
   }
