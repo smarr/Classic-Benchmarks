@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package com.eclipsesource.json;
+package som.com.eclipsesource.json;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -43,19 +43,19 @@ class JsonWriter {
 
   protected final Writer writer;
 
-  JsonWriter( Writer writer ) {
+  JsonWriter( final Writer writer ) {
     this.writer = writer;
   }
 
-  protected void writeLiteral( String value ) throws IOException {
+  protected void writeLiteral( final String value ) throws IOException {
     writer.write( value );
   }
 
-  protected void writeNumber( String string ) throws IOException {
+  protected void writeNumber( final String string ) throws IOException {
     writer.write( string );
   }
 
-  protected void writeString( String string ) throws IOException {
+  protected void writeString( final String string ) throws IOException {
     writer.write( '"' );
     writeJsonString( string );
     writer.write( '"' );
@@ -81,7 +81,7 @@ class JsonWriter {
     writer.write( '}' );
   }
 
-  protected void writeMemberName( String name ) throws IOException {
+  protected void writeMemberName( final String name ) throws IOException {
     writer.write( '"' );
     writeJsonString( name );
     writer.write( '"' );
@@ -95,7 +95,7 @@ class JsonWriter {
     writer.write( ',' );
   }
 
-  protected void writeJsonString( String string ) throws IOException {
+  protected void writeJsonString( final String string ) throws IOException {
     int length = string.length();
     int start = 0;
     for( int index = 0; index < length; index++ ) {
@@ -109,7 +109,7 @@ class JsonWriter {
     writer.write( string, start, length - start );
   }
 
-  private static char[] getReplacementChars( char ch ) {
+  private static char[] getReplacementChars( final char ch ) {
     if( ch > '\\' ) {
       if( ch < '\u2028' || ch > '\u2029') {
         // The lower range contains 'a' .. 'z'. Only 2 checks required.

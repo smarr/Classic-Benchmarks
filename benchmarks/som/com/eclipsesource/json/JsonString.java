@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 EclipseSource.
+ * Copyright (c) 2013, 2015 EclipseSource.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,53 +19,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package com.eclipsesource.json;
+package som.com.eclipsesource.json;
+
+import java.io.IOException;
 
 
-/**
- * An unchecked exception to indicate that an input does not qualify as valid JSON.
- */
 @SuppressWarnings( "serial" ) // use default serial UID
-public class ParseException extends RuntimeException {
+class JsonString extends JsonValue {
 
-  private final int offset;
-  private final int line;
-  private final int column;
+  private final String string;
 
-  ParseException( String message, int offset, int line, int column ) {
-    super( message + " at " + line + ":" + column );
-    this.offset = offset;
-    this.line = line;
-    this.column = column;
+  JsonString( final String string ) {
+    if( string == null ) {
+      throw new NullPointerException( "string is null" );
+    }
+    this.string = string;
   }
 
-  /**
-   * Returns the absolute index of the character at which the error occurred. The
-   * index of the first character of a document is 0.
-   *
-   * @return the character offset at which the error occurred, will be &gt;= 0
-   */
-  public int getOffset() {
-    return offset;
+  @Override
+  void write( final JsonWriter writer ) throws IOException {
+    writer.writeString( string );
   }
 
-  /**
-   * Returns the number of the line in which the error occurred. The first line counts as 1.
-   *
-   * @return the line in which the error occurred, will be &gt;= 1
-   */
-  public int getLine() {
-    return line;
+  @Override
+  public boolean isString() {
+    return true;
   }
 
-  /**
-   * Returns the index of the character at which the error occurred, relative to the line. The
-   * index of the first character of a line is 0.
-   *
-   * @return the column in which the error occurred, will be &gt;= 0
-   */
-  public int getColumn() {
-    return column;
+  @Override
+  public String asString() {
+    return string;
+  }
+
+  @Override
+  public int hashCode() {
+    return string.hashCode();
+  }
+
+  @Override
+  public boolean equals( final Object object ) {
+    if( this == object ) {
+      return true;
+    }
+    if( object == null ) {
+      return false;
+    }
+    if( getClass() != object.getClass() ) {
+      return false;
+    }
+    JsonString other = (JsonString)object;
+    return string.equals( other.string );
   }
 
 }

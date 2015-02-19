@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package com.eclipsesource.json;
+package som.com.eclipsesource.json;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -98,7 +98,7 @@ public abstract class JsonValue implements Serializable {
    * @throws ParseException
    *           if the input is not valid JSON
    */
-  public static JsonValue readFrom( Reader reader ) throws IOException {
+  public static JsonValue readFrom( final Reader reader ) throws IOException {
     return new JsonParser( reader ).parse();
   }
 
@@ -111,7 +111,7 @@ public abstract class JsonValue implements Serializable {
    * @throws ParseException
    *           if the input is not valid JSON
    */
-  public static JsonValue readFrom( String text ) {
+  public static JsonValue readFrom( final String text ) {
     try {
       return new JsonParser( text ).parse();
     } catch( IOException exception ) {
@@ -127,7 +127,7 @@ public abstract class JsonValue implements Serializable {
    *          the value to get a JSON representation for
    * @return a JSON value that represents the given value
    */
-  public static JsonValue valueOf( int value ) {
+  public static JsonValue valueOf( final int value ) {
     return new JsonNumber( Integer.toString( value, 10 ) );
   }
 
@@ -138,7 +138,7 @@ public abstract class JsonValue implements Serializable {
    *          the value to get a JSON representation for
    * @return a JSON value that represents the given value
    */
-  public static JsonValue valueOf( long value ) {
+  public static JsonValue valueOf( final long value ) {
     return new JsonNumber( Long.toString( value, 10 ) );
   }
 
@@ -149,7 +149,7 @@ public abstract class JsonValue implements Serializable {
    *          the value to get a JSON representation for
    * @return a JSON value that represents the given value
    */
-  public static JsonValue valueOf( float value ) {
+  public static JsonValue valueOf( final float value ) {
     if( Float.isInfinite( value ) || Float.isNaN( value ) ) {
       throw new IllegalArgumentException( "Infinite and NaN values not permitted in JSON" );
     }
@@ -163,7 +163,7 @@ public abstract class JsonValue implements Serializable {
    *          the value to get a JSON representation for
    * @return a JSON value that represents the given value
    */
-  public static JsonValue valueOf( double value ) {
+  public static JsonValue valueOf( final double value ) {
     if( Double.isInfinite( value ) || Double.isNaN( value ) ) {
       throw new IllegalArgumentException( "Infinite and NaN values not permitted in JSON" );
     }
@@ -177,7 +177,7 @@ public abstract class JsonValue implements Serializable {
    *          the string to get a JSON representation for
    * @return a JSON value that represents the given string
    */
-  public static JsonValue valueOf( String string ) {
+  public static JsonValue valueOf( final String string ) {
     return string == null ? NULL : new JsonString( string );
   }
 
@@ -188,7 +188,7 @@ public abstract class JsonValue implements Serializable {
    *          the value to get a JSON representation for
    * @return a JSON value that represents the given value
    */
-  public static JsonValue valueOf( boolean value ) {
+  public static JsonValue valueOf( final boolean value ) {
     return value ? TRUE : FALSE;
   }
 
@@ -397,7 +397,7 @@ public abstract class JsonValue implements Serializable {
    * @throws IOException
    *           if an I/O error occurs in the writer
    */
-  public void writeTo( Writer writer ) throws IOException {
+  public void writeTo( final Writer writer ) throws IOException {
     writeTo( writer, null );
   }
 
@@ -414,7 +414,7 @@ public abstract class JsonValue implements Serializable {
    * @throws IOException
    *           if an I/O error occurs in the writer
    */
-  public void writeTo( Writer writer, WriterConfig config ) throws IOException {
+  public void writeTo( final Writer writer, final WriterConfig config ) throws IOException {
     WritingBuffer buffer = new WritingBuffer( writer, 128 );
     write( config == null ? new JsonWriter( buffer ) : config.createWriter( buffer ) );
     buffer.flush();
@@ -439,7 +439,7 @@ public abstract class JsonValue implements Serializable {
    *          a configuration that controls the formatting or <code>null</code> for the minimal form
    * @return a JSON string that represents this value
    */
-  public String toString( WriterConfig config ) {
+  public String toString( final WriterConfig config ) {
     StringWriter writer = new StringWriter();
     try {
       writeTo( writer, config );
@@ -464,7 +464,7 @@ public abstract class JsonValue implements Serializable {
    * @return true if this object is the same as the object argument; false otherwise
    */
   @Override
-  public boolean equals( Object object ) {
+  public boolean equals( final Object object ) {
     return super.equals( object );
   }
 
@@ -475,7 +475,7 @@ public abstract class JsonValue implements Serializable {
 
   abstract void write( JsonWriter writer ) throws IOException;
 
-  private static String cutOffPointZero( String string ) {
+  private static String cutOffPointZero( final String string ) {
     if( string.endsWith( ".0" ) ) {
       return string.substring( 0, string.length() - 2 );
     }

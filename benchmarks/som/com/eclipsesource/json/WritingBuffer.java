@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package com.eclipsesource.json;
+package som.com.eclipsesource.json;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -37,17 +37,17 @@ class WritingBuffer extends Writer {
   private final char[] buffer;
   private int fill = 0;
 
-  WritingBuffer( Writer writer ) {
+  WritingBuffer( final Writer writer ) {
     this( writer, 16 );
   }
 
-  WritingBuffer( Writer writer, int bufferSize ) {
+  WritingBuffer( final Writer writer, final int bufferSize ) {
     this.writer = writer;
     buffer = new char[bufferSize];
   }
 
   @Override
-  public void write( int c ) throws IOException {
+  public void write( final int c ) throws IOException {
     if( fill > buffer.length - 1 ) {
       flush();
     }
@@ -55,7 +55,7 @@ class WritingBuffer extends Writer {
   }
 
   @Override
-  public void write( char[] cbuf, int off, int len ) throws IOException {
+  public void write( final char[] cbuf, final int off, final int len ) throws IOException {
     if( fill > buffer.length - len ) {
       flush();
       if( len > buffer.length ) {
@@ -68,7 +68,7 @@ class WritingBuffer extends Writer {
   }
 
   @Override
-  public void write( String str, int off, int len ) throws IOException {
+  public void write( final String str, final int off, final int len ) throws IOException {
     if( fill > buffer.length - len ) {
       flush();
       if( len > buffer.length ) {

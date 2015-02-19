@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package com.eclipsesource.json;
+package som.com.eclipsesource.json;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -51,16 +51,16 @@ class JsonParser {
    *                       |  index           fill
    */
 
-  JsonParser( String string ) {
+  JsonParser( final String string ) {
     this( new StringReader( string ),
           Math.max( MIN_BUFFER_SIZE, Math.min( DEFAULT_BUFFER_SIZE, string.length() ) ) );
   }
 
-  JsonParser( Reader reader ) {
+  JsonParser( final Reader reader ) {
     this( reader, DEFAULT_BUFFER_SIZE );
   }
 
-  JsonParser( Reader reader, int buffersize ) {
+  JsonParser( final Reader reader, final int buffersize ) {
     this.reader = reader;
     buffer = new char[ buffersize ];
     line = 1;
@@ -183,7 +183,7 @@ class JsonParser {
     return JsonValue.FALSE;
   }
 
-  private void readRequiredChar( char ch ) throws IOException {
+  private void readRequiredChar( final char ch ) throws IOException {
     if( !readChar( ch ) ) {
       throw expected( "'" + ch + "'" );
     }
@@ -295,7 +295,7 @@ class JsonParser {
     return true;
   }
 
-  private boolean readChar( char ch ) throws IOException {
+  private boolean readChar( final char ch ) throws IOException {
     if( current != ch ) {
       return false;
     }
@@ -365,14 +365,14 @@ class JsonParser {
     return captured;
   }
 
-  private ParseException expected( String expected ) {
+  private ParseException expected( final String expected ) {
     if( isEndOfText() ) {
       return error( "Unexpected end of input" );
     }
     return error( "Expected " + expected );
   }
 
-  private ParseException error( String message ) {
+  private ParseException error( final String message ) {
     int absIndex = bufferOffset + index;
     int column = absIndex - lineOffset;
     int offset = isEndOfText() ? absIndex : absIndex - 1;

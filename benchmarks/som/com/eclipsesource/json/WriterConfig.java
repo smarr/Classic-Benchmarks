@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package com.eclipsesource.json;
+package som.com.eclipsesource.json;
 
 import java.io.Writer;
 
@@ -34,7 +34,7 @@ public abstract class WriterConfig {
    */
   public static WriterConfig MINIMAL = new WriterConfig() {
     @Override
-    JsonWriter createWriter( Writer writer ) {
+    JsonWriter createWriter( final Writer writer ) {
       return new JsonWriter( writer );
     }
   };
@@ -45,7 +45,7 @@ public abstract class WriterConfig {
    */
   public static WriterConfig PRETTY_PRINT = new WriterConfig() {
     @Override
-    JsonWriter createWriter( Writer writer ) {
+    JsonWriter createWriter( final Writer writer ) {
       return new PrettyPrinter( writer );
     }
   };

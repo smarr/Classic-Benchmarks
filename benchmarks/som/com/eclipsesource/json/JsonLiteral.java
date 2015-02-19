@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  ******************************************************************************/
-package com.eclipsesource.json;
+package som.com.eclipsesource.json;
 
 import java.io.IOException;
 
@@ -36,7 +36,7 @@ class JsonLiteral extends JsonValue {
   private final boolean isTrue;
   private final boolean isFalse;
 
-  private JsonLiteral( String value  ) {
+  private JsonLiteral( final String value  ) {
     this.value = value;
     isNull = "null".equals( value );
     isTrue = "true".equals( value );
@@ -44,7 +44,7 @@ class JsonLiteral extends JsonValue {
   }
 
   @Override
-  void write( JsonWriter writer ) throws IOException {
+  void write( final JsonWriter writer ) throws IOException {
     writer.writeLiteral( value );
   }
 
@@ -84,7 +84,7 @@ class JsonLiteral extends JsonValue {
   }
 
   @Override
-  public boolean equals( Object object ) {
+  public boolean equals( final Object object ) {
     if( this == object ) {
       return true;
     }
