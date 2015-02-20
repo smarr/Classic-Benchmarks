@@ -26,7 +26,7 @@ import java.io.Reader;
 import java.io.StringReader;
 
 
-class JsonParser {
+public class JsonParser {
 
   private static final int MIN_BUFFER_SIZE = 10;
   private static final int DEFAULT_BUFFER_SIZE = 1024;
@@ -51,7 +51,7 @@ class JsonParser {
    *                       |  index           fill
    */
 
-  JsonParser( final String string ) {
+  public JsonParser( final String string ) {
     this( new StringReader( string ),
           Math.max( MIN_BUFFER_SIZE, Math.min( DEFAULT_BUFFER_SIZE, string.length() ) ) );
   }
@@ -67,7 +67,7 @@ class JsonParser {
     captureStart = -1;
   }
 
-  JsonValue parse() throws IOException {
+  public JsonValue parse() throws IOException {
     read();
     skipWhiteSpace();
     JsonValue result = readValue();
