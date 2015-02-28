@@ -320,12 +320,12 @@ public class JsonPureStringParser {
   private String endCapture() {
     int end = current == null ? index : index - 1;
     String captured;
-    if( captureBuffer.length() > 0 ) {
-      captureBuffer += input.substring(captureStart, end + 1);
-      captured = captureBuffer.toString();
-      captureBuffer = "";
-    } else {
+    if ("".equals(captureBuffer)) {
       captured = input.substring(captureStart, end + 1);
+    } else {
+      captureBuffer += input.substring(captureStart, end + 1);
+      captured = captureBuffer;
+      captureBuffer = "";
     }
     captureStart = -1;
     return captured;
