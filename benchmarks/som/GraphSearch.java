@@ -115,11 +115,16 @@ public class GraphSearch extends Benchmark {
 
   @Override
   public Object benchmark() {
+    throw new RuntimeException("Should never be reached");
+  }
+
+  @Override
+  public boolean innerBenchmarkLoop() {
     JenkinsRandom.setSeed(49734321);
-    int noOfNodes = EXPECTED_NO_OF_NODES;
+    int noOfNodes = (EXPECTED_NO_OF_NODES / 1000) * innerIterations;
     initializeGraph(noOfNodes);
     breadthFirstSearch(noOfNodes);
-    return hCost;
+    return verifyResult(hCost);
   }
 
   private void breadthFirstSearch(final int noOfNodes) {
@@ -154,8 +159,14 @@ public class GraphSearch extends Benchmark {
     } while(stop);
   }
 
+  private Integer firstCost;
+
   @Override
   public boolean verifyResult(final Object result) {
+    if (hCost.length != (EXPECTED_NO_OF_NODES / 1000) * innerIterations) {
+      return false;
+    }
+
     int totalCost = 0;
 
     for (int i = 0; i < hCost.length; ++i) {
@@ -169,8 +180,12 @@ public class GraphSearch extends Benchmark {
               + EXPECTED_TOTAL_COST + "'");
       }
     } else {
-      System.out.println("WARNING: no self-checking step for '" + hCost.length
-          + "' nodes, only valid for '" + EXPECTED_NO_OF_NODES + "' nodes");
+      if (firstCost == null) {
+        firstCost = totalCost;
+        return true;
+      } else {
+        return firstCost.equals(totalCost);
+      }
     }
 
     return true;
