@@ -1,6 +1,7 @@
 package som;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
 Breadth-first search
@@ -60,17 +61,15 @@ public class GraphSearch extends Benchmark {
 
   private void initializeGraph(final int noOfNodes) {
     hGraphNodes        = new Node[noOfNodes];
-    hGraphMask         = new boolean[noOfNodes];
-    hUpdatingGraphMask = new boolean[noOfNodes];
-    hGraphVisited      = new boolean[noOfNodes];
-    hCost              = new int[noOfNodes];
+    hGraphMask         = new boolean[noOfNodes]; Arrays.fill(hGraphMask, false);
+    hUpdatingGraphMask = new boolean[noOfNodes]; Arrays.fill(hUpdatingGraphMask, false);
+    hGraphVisited      = new boolean[noOfNodes]; Arrays.fill(hGraphVisited, false);
+    hCost              = new int[noOfNodes];     Arrays.fill(hCost, -1);
 
     int source = 0;
     @SuppressWarnings("unchecked")
     ArrayList<Edge>[] graph = new ArrayList[noOfNodes];
-    for (int i = 0; i < noOfNodes; ++i) {
-        graph[i] = new ArrayList<>();
-    }
+    Arrays.setAll(graph, (i) -> new ArrayList<Edge>());
 
     for (int i = 0; i < noOfNodes; ++i) {
         int noOfEdges = Math.abs(JenkinsRandom.random() % (MAX_INIT_EDGES - MIN_EDGES + 1)) + MIN_EDGES;
@@ -85,12 +84,8 @@ public class GraphSearch extends Benchmark {
 
     int totalEdges = 0;
     for (int i = 0; i < noOfNodes; ++i) {
-        int noOfEdges         = graph[i].size();
-        hGraphNodes[i]        = new Node(totalEdges, noOfEdges);
-        hGraphMask[i]         = false;
-        hUpdatingGraphMask[i] = false;
-        hGraphVisited[i]      = false;
-
+        int noOfEdges  = graph[i].size();
+        hGraphNodes[i] = new Node(totalEdges, noOfEdges);
         totalEdges += noOfEdges;
     }
 
@@ -107,9 +102,6 @@ public class GraphSearch extends Benchmark {
         }
     }
 
-    for (int i = 0; i < noOfNodes; ++i) {
-        hCost[i] = -1;
-    }
     hCost[source] = 0;
   }
 
