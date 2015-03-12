@@ -1,5 +1,7 @@
 package som;
 
+import java.util.Arrays;
+
 // Based on: https://github.com/Sable/Ostrich/blob/master/map-reduce/page-rank/js/pagerank.js
 
 public class PageRank extends Benchmark {
@@ -74,12 +76,6 @@ public class PageRank extends Benchmark {
     return pages;
   }
 
-  private void initArray(final double[] a, final int n, final double val) {
-    for (int i = 0; i < n; ++i) {
-      a[i] = val;
-    }
-  }
-
   private void mapPageRank(final int[] pages, final double[] pageRanks,
       final double[] maps, final int[] nOutLinks, final int n) {
     for (int i = 0; i < n; ++i) {
@@ -111,19 +107,33 @@ public class PageRank extends Benchmark {
 
   @Override
   public Object benchmark() {
-    return runPageRank(5000, 10, 0.00000001, 100000);
     JenkinsRandom.setSeed(49734321);
+    n       = 5000;
+    iter    = 10;
+    thresh  = 0.00000001;
+    divisor = 100000;
+    return runPageRank();
   }
 
-  private double[] runPageRank(final int n, final int iter, final double thresh, final int divisor) {
-    double maxDiff = Double.POSITIVE_INFINITY;
+  double   maxDiff;
+  double[] pageRanks;
+  double[] maps;
+  int[]    nOutLinks;
+  int[]    pages;
+  int      t;
+  int      n;
+  int      iter;
+  int      divisor;
+  double   thresh;
 
-    double[] pageRanks = new double[n];
-    double[] maps      = new double[n * n];
-    int[]    nOutLinks = new int[n];
+  private double[] runPageRank() {
+    maxDiff = Double.POSITIVE_INFINITY;
 
-    int[] pages = randomPages(n, nOutLinks, divisor);
-    initArray(pageRanks, n, 1.0 / n);
+    pageRanks = new double[n];     Arrays.fill(pageRanks, 1.0 / n);
+    maps      = new double[n * n];
+    nOutLinks = new int[n];
+
+    pages = randomPages(n, nOutLinks, divisor);
 
     int nbLinks = 0;
     for (int i = 0; i < n; ++i) {
@@ -132,12 +142,15 @@ public class PageRank extends Benchmark {
       }
     }
 
-    int t;
     for (t = 1; t <= iter && maxDiff >= thresh; ++t) {
       mapPageRank(pages, pageRanks, maps, nOutLinks, n);
       maxDiff = reducePageRank(pageRanks, maps, n);
     }
+    return pageRanks;
+  }
 
+  @Override
+  public boolean verifyResult(final Object result) {
     if (n == 5000 && iter == 10 && thresh == 0.00000001 && divisor == 100000) {
       if (pageRanks.length != EXCPECTED_PAGE_RANKS.length) {
         throw new RuntimeException("Invalid length of page_ranks array");
@@ -151,9 +164,6 @@ public class PageRank extends Benchmark {
     } else {
       System.out.println("WARNING: No self-checking for n = '" + n + "', iteration = '" + iter + "', threshold = '" + thresh + "', and divisor = '" + divisor + "'");
     }
-
-    System.out.println("T reached "+ t + " at max dif " + maxDiff + "\n");
-
-    return pageRanks;
+    return true;
   }
 }
