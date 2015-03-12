@@ -18,8 +18,7 @@ public class Richards extends Benchmark {
   @Override
   public Object benchmark() {
     RBObject.initialize();
-    (new RichardsBenchmarks()).reBenchStart();
-    return null;
+    return (new RichardsBenchmarks()).reBenchStart();
   }
 
   @Override
