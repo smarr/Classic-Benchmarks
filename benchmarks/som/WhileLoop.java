@@ -9,7 +9,7 @@ public class WhileLoop extends Benchmark {
     }
     return sum;
   }
-  
+
   @Override
   public Object benchmark() {
     int sum = 0;
@@ -18,8 +18,13 @@ public class WhileLoop extends Benchmark {
     }
     return sum;
   }
-  
-  public static void main(String[] args) {
+
+  public static void main(final String[] args) {
     new WhileLoop().run(args);
+  }
+
+  @Override
+  public boolean verifyResult(final Object result) {
+    return result.equals(20000);
   }
 }

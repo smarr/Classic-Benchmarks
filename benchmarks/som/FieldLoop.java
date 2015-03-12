@@ -52,4 +52,9 @@ public class FieldLoop extends Benchmark {
   public static void main(final String[] args) {
     new FieldLoop().run(args);
   }
+
+  @Override
+  public boolean verifyResult(final Object result) {
+    return result.equals(600000);
+  }
 }

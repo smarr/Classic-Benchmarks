@@ -11,19 +11,20 @@ public class Queens extends Benchmark {
 
   @Override
   public Object benchmark() {
+    boolean result = true;
     for (int i = 0; i < 10; i++) {
-      queens();
+      result = result && queens();
     }
-    return null;
+    return result;
   }
 
-  void queens() {
+  private boolean queens() {
     freeRows  = new boolean[ 8]; Arrays.fill(freeRows, true);
     freeMaxs  = new boolean[16]; Arrays.fill(freeMaxs, true);
     freeMins  = new boolean[16]; Arrays.fill(freeMins, true);
     queenRows = new     int[ 8]; Arrays.fill(queenRows, -1);
 
-    if (!placeQueen(0)) { error("Wrong result"); }
+    return placeQueen(0);
   }
 
   boolean placeQueen(final int c) {
@@ -57,5 +58,10 @@ public class Queens extends Benchmark {
 
   public static void main(final String[] args) {
     new Queens().run(args);
+  }
+
+  @Override
+  public boolean verifyResult(final Object result) {
+    return (boolean) result;
   }
 }

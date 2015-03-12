@@ -72,13 +72,15 @@ public class Towers extends Benchmark {
     buildTowerAt(1, 13);
     movesDone = 0;
     moveDisks(13, 1, 2);
-    if (movesDone != 8191) {
-      error("Error in result: " + movesDone + " should be: 8191");
-    }
-    return null;
+    return movesDone;
   }
 
   public static void main(final String[] args) {
     new Towers().run(args);
+  }
+
+  @Override
+  public boolean verifyResult(final Object result) {
+    return assertEquals(8191, result);
   }
 }

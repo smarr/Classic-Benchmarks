@@ -58,15 +58,20 @@ public class DeltaBlue extends Benchmark {
   }
 
   @Override
-  public Object innerBenchmarkLoop() {
+  public boolean innerBenchmarkLoop() {
     Strength.initialize();
     Planner.chainTest(innerIterations);
     Planner.projectionTest(innerIterations);
-    return null;
+    return true;
   }
 
   @Override
   public Object benchmark() {
+    throw new RuntimeException("Should not be reachable.");
+  }
+
+  @Override
+  public boolean verifyResult(final Object result) {
     throw new RuntimeException("Should not be reachable.");
   }
 }

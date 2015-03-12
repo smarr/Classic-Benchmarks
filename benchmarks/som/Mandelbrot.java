@@ -46,18 +46,16 @@ class Mandelbrot extends Benchmark {
     new Mandelbrot().run(args);
   }
 
+  private Object firstResult;
+
   @Override
-  public Object innerBenchmarkLoop() {
-    mandelbrot(innerIterations);
-    return null;
+  public boolean innerBenchmarkLoop() {
+    return verifyResult(mandelbrot(innerIterations));
   }
 
   @Override
   public Object benchmark() {
-    if (mandelbrot(750) != 192) {
-      error("Mandelbrot delivers wrong results.");
-    }
-    return null;
+    throw new RuntimeException("Should never be reached");
   }
 
   public int mandelbrot(final int size) {
@@ -122,5 +120,16 @@ class Mandelbrot extends Benchmark {
      System.out.println(sum);
      return sum;
    }
+
+  @Override
+  public boolean verifyResult(final Object result) {
+    if (innerIterations == 750) {
+      return result.equals(50);
+    }
+    if (firstResult == null) {
+      firstResult = result;
+    }
+    return firstResult.equals(result);
+  }
 
 }

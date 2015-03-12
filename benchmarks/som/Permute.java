@@ -9,10 +9,7 @@ public class Permute extends Benchmark {
     count = 0;
     v     = new int[7];
     permute(6);
-    if (count != 8660) {
-      error("Wrong result: " + count + " should be: 8660");
-    }
-    return null;
+    return count;
   }
 
   void permute(final int n) {
@@ -35,5 +32,10 @@ public class Permute extends Benchmark {
 
   public static void main(final String[] args) {
     new Permute().run(args);
+  }
+
+  @Override
+  public boolean verifyResult(final Object result) {
+    return assertEquals(8660, result);
   }
 }

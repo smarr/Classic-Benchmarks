@@ -11,24 +11,39 @@ package som;
  modified slightly by Chad Whipkey
 
  */
-
 public final class NBody extends Benchmark {
+
+  private Object expectedEnergy;
 
   public static void main(final String[] args) {
     new NBody().run(args);
   }
 
   @Override
-  public Object innerBenchmarkLoop() {
+  public boolean innerBenchmarkLoop() {
     NBodySystem bodies = new NBodySystem();
     for (int i = 0; i < innerIterations; i++) {
       bodies.advance(0.01);
     }
-    return null;
+
+    if (innerIterations == 250000) {
+      return bodies.energy() == -0.1690859889909308;
+    }
+
+    if (expectedEnergy == null) {
+      expectedEnergy = bodies.energy();
+      return true;
+    }
+    return expectedEnergy.equals(bodies.energy());
   }
 
   @Override
   public Object benchmark() {
+    throw new RuntimeException("Should never be reached");
+  }
+
+  @Override
+  public boolean verifyResult(final Object result) {
     throw new RuntimeException("Should never be reached");
   }
 }

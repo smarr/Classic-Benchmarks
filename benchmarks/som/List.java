@@ -67,4 +67,9 @@ public class List extends Benchmark {
   public static void main(final String[] args) {
     new List().run(args);
   }
+
+  @Override
+  public boolean verifyResult(final Object result) {
+    return assertEquals(10, result);
+  }
 }

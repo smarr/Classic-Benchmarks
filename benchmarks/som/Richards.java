@@ -21,4 +21,9 @@ public class Richards extends Benchmark {
     (new RichardsBenchmarks()).reBenchStart();
     return null;
   }
+
+  @Override
+  public boolean verifyResult(final Object result) {
+    return (boolean) result;
+  }
 }

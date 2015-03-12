@@ -134,7 +134,7 @@ public class RichardsBenchmarks extends RBObject {
         }, dataRecord);
   }
 
-  public void reBenchStart() {
+  public boolean reBenchStart() {
     Packet workQ;
     initTrace();
     initScheduler();
@@ -169,9 +169,7 @@ public class RichardsBenchmarks extends RBObject {
 
     schedule();
 
-    if (queuePacketCount != 23246 || holdCount != 9297) {
-      throw new RuntimeException("Results are incorrect");
-    }
+    return queuePacketCount == 23246 && holdCount == 9297;
   }
 
   TaskControlBlock findTask(final int identity) {

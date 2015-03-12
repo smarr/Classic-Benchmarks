@@ -3,23 +3,18 @@ package som;
 import java.util.Arrays;
 
 public class Storage extends Benchmark {
-  
+
   int count;
 
   @Override
   public Object benchmark() {
     Random.initialize();
     count = 0;
-    
     buildTreeDepth(7);
-    
-    if (count != 5461) {
-      error("Wrong result: " + count + " should be 5461");
-    }
-    return null;
+    return count;
   }
-  
-  private Object buildTreeDepth(int depth) {
+
+  private Object buildTreeDepth(final int depth) {
     count++;
     if (depth == 1) {
       return new Object[Random.next() % 10 + 1];
@@ -30,7 +25,12 @@ public class Storage extends Benchmark {
     }
   }
 
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     new Storage().run(args);
+  }
+
+  @Override
+  public boolean verifyResult(final Object result) {
+    return assertEquals(5461, result);
   }
 }

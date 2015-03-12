@@ -16,7 +16,7 @@ public class Bounce extends Benchmark {
       xVel = (Random.next() % 300) - 150;
       yVel = (Random.next() % 300) - 150;
     }
-    
+
     public boolean bounce() {
       int xLimit = 500;
       int yLimit = 500;
@@ -49,11 +49,12 @@ public class Bounce extends Benchmark {
         }
       }
     }
+    return bounces;
+  }
 
-    if (bounces != 1331) {
-      error("Wrong result: " + bounces + " should be: 1331");
-    }
-    return null;
+  @Override
+  public boolean verifyResult(final Object result) {
+    return assertEquals(1331, result);
   }
 
   public static void main(final String[] args) {

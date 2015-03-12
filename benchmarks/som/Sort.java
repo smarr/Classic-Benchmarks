@@ -11,11 +11,12 @@ public abstract class Sort extends Benchmark {
   public Object benchmark() {
     int[] array = randomArray(dataSize());
     sort(array);
-    checkArray(array);
     return array;
   }
 
-  void checkArray(final int[] array) {
+  @Override
+  public boolean verifyResult(final Object result) {
+    int[] array = (int[]) result;
     if (array[0] != smallest || array[array.length - 1] != largest) {
       error("Array is not sorted. smallest: " + smallest + " largest: " +
             largest + " [0]: " + array[0] + " [l]: " + array[array.length - 1]);
@@ -26,6 +27,7 @@ public abstract class Sort extends Benchmark {
         error("Array is not sorted. [" + i + " - 1]: " + array[i - 1] + " [" + i + "]: " + array[i]);
       }
     }
+    return true;
   }
 
   int[] randomArray(final int size) {

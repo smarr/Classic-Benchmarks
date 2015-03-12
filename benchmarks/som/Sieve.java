@@ -7,11 +7,7 @@ public class Sieve extends Benchmark {
   @Override
   public Object benchmark() {
     boolean[] flags = new boolean[5000];
-    int result = sieve(flags, 5000);
-    if (result != 669) {
-      error("Wrong result " + result + " should be: 669");
-    }
-    return null;
+    return sieve(flags, 5000);
   }
 
   int sieve(final boolean[] flags, final int size) {
@@ -33,5 +29,10 @@ public class Sieve extends Benchmark {
 
   public static void main(final String[] args) {
     new Sieve().run(args);
+  }
+
+  @Override
+  public boolean verifyResult(final Object result) {
+    return assertEquals(669, result);
   }
 }

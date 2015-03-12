@@ -86,14 +86,14 @@ public class Fannkuch extends Benchmark {
   }
 
   @Override
-  public Object innerBenchmarkLoop() {
+  public boolean innerBenchmarkLoop() {
     initialize(innerIterations);
     int result = maxPfannkuchen();
     System.out.print("Pfannkuchen(");
     System.out.print(innerIterations);
     System.out.print(") = ");
     System.out.println(result);
-    return null;
+    return result == expectedResult(innerIterations);
   }
 
   @Override
@@ -103,5 +103,18 @@ public class Fannkuch extends Benchmark {
 
   public static void main(final String[] args) {
     new Fannkuch().run(args);
+  }
+
+  @Override
+  public boolean verifyResult(final Object result) {
+    throw new RuntimeException("Should never be reached");
+  }
+
+  private static int[] results;
+  private static int expectedResult(final int problemSize) {
+    if (results == null) {
+      results = new int[]{ 0, 1, 2, 4, 7, 10, 16, 22, 30, 38, 51, 65};
+    }
+    return results[problemSize];
   }
 }

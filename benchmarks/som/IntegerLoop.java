@@ -5,13 +5,19 @@ public class IntegerLoop extends Benchmark {
   @Override
   public Object benchmark() {
     int bounds = 20000;
+    int a = 0;
     for (int i = -bounds; i <= bounds; i++) {
-      int a = i - i;
+      a = i - i;
     }
-    return null;
+    return a;
   }
 
-  public static void main(String[] args){
+  public static void main(final String[] args){
     new IntegerLoop().run(args);
+  }
+
+  @Override
+  public boolean verifyResult(final Object result) {
+    return result.equals(0);
   }
 }

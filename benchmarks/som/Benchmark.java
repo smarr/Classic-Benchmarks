@@ -21,30 +21,41 @@ public abstract class Benchmark {
     int warmUp        = Integer.valueOf(args[1]);
     innerIterations   = Integer.valueOf(args[2]);
 
-    Object result;
     for (int i = 0; i < warmUp; i++) {
-      result = innerBenchmarkLoop();
+      if (!innerBenchmarkLoop()) {
+        error("Benchmark failed with incorrect result");
+      }
     }
 
     String className = getClass().getName();
     for (int i = 0; i < numIterations; i++) {
       long start = System.nanoTime();
-      result = innerBenchmarkLoop();
+      if (!innerBenchmarkLoop()) {
+        error("Benchmark failed with incorrect result");
+      }
       long end = System.nanoTime();
       long microseconds = (end - start) / 1000;
-
 
       System.out.println(className + ": iterations=1 runtime: " + microseconds + "us");
     }
   }
 
   public abstract Object benchmark();
+  public abstract boolean verifyResult(Object result);
 
-  public Object innerBenchmarkLoop() {
-    Object result = null;
+  public boolean innerBenchmarkLoop() {
     for (int i = 0; i < innerIterations; i++) {
-      result = benchmark();
+      if (!verifyResult(benchmark())) {
+        return false;
+      }
     }
-    return result;
+    return true;
+  }
+
+  public boolean assertEquals(final Object expected, final Object value) {
+    if (!expected.equals(value)) {
+      error("Expected value (" + expected + ") differs from actual (" + value + ") benchmark result.");
+    }
+    return true;
   }
 }
