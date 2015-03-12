@@ -14,7 +14,7 @@ public class WhileLoop extends Benchmark {
   public Object benchmark() {
     int sum = 0;
     while (sum < 20000) {
-      sum += sum + singleRun();
+      sum += singleRun();
     }
     return sum;
   }
