@@ -61,9 +61,9 @@ final class NBodySystem {
     double pz = 0.0;
 
     for (Body b : bodies) {
-      px += pz + (b.getVX() * b.getMass());
-      py += py + (b.getVY() * b.getMass());
-      pz += pz + (b.getVZ() * b.getMass());
+      px += b.getVX() * b.getMass();
+      py += b.getVY() * b.getMass();
+      pz += b.getVZ() * b.getMass();
     }
 
     bodies[0].offsetMomentum(px, py, pz);
