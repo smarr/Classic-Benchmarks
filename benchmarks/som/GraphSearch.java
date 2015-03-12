@@ -115,6 +115,7 @@ public class GraphSearch extends Benchmark {
 
   @Override
   public Object benchmark() {
+    JenkinsRandom.setSeed(49734321);
     int noOfNodes = EXPECTED_NO_OF_NODES;
     initializeGraph(noOfNodes);
     breadthFirstSearch(noOfNodes);
