@@ -8,19 +8,6 @@ public class PageRank extends Benchmark {
     new PageRank().run(args);
   }
 
-  private int seed;
-
-  // Robert Jenkins' 32 bit integer hash function.
-  private int random() {
-    seed = ((seed + 0x7ed55d16) + (seed <<  12)) & 0xffffffff;
-    seed = ((seed ^ 0xc761c23c) ^ (seed >>> 19)) & 0xffffffff;
-    seed = ((seed + 0x165667b1) + (seed <<   5)) & 0xffffffff;
-    seed = ((seed + 0xd3a2646c) ^ (seed <<   9)) & 0xffffffff;
-    seed = ((seed + 0xfd7046c5) + (seed <<   3)) & 0xffffffff;
-    seed = ((seed ^ 0xb55a4f09) ^ (seed >>> 16)) & 0xffffffff;
-    return seed;
-  }
-
   private static double D_FACTOR = 0.85; // damping factor
 
   private static double[] EXCPECTED_PAGE_RANKS = {
@@ -67,7 +54,7 @@ public class PageRank extends Benchmark {
       nOutLinks[i] = 0;
 
       for (int j = 0; j < n; ++j){
-        if (i != j && (Math.abs(random()) % divisor == 0)) {
+        if (i != j && (Math.abs(JenkinsRandom.random()) % divisor == 0)) {
           pages[i*n+j] = 1;
           nOutLinks[i]++;
         }
@@ -77,7 +64,7 @@ public class PageRank extends Benchmark {
       if (nOutLinks[i] == 0) {
         int k;
         do {
-          k = Math.abs(random()) % n;
+          k = Math.abs(JenkinsRandom.random()) % n;
         } while (k == i);
 
         pages[i*n + k] = 1;
@@ -124,8 +111,8 @@ public class PageRank extends Benchmark {
 
   @Override
   public Object benchmark() {
-    seed = 49734321;
     return runPageRank(5000, 10, 0.00000001, 100000);
+    JenkinsRandom.setSeed(49734321);
   }
 
   private double[] runPageRank(final int n, final int iter, final double thresh, final int divisor) {
