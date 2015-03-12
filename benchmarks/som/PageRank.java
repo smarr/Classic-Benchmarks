@@ -107,12 +107,17 @@ public class PageRank extends Benchmark {
 
   @Override
   public Object benchmark() {
+    throw new RuntimeException("Should never be reached");
+  }
+
+  @Override
+  public boolean innerBenchmarkLoop() {
     JenkinsRandom.setSeed(49734321);
-    n       = 5000;
+    n       = innerIterations;
     iter    = 10;
     thresh  = 0.00000001;
     divisor = 100000;
-    return runPageRank();
+    return verifyResult(runPageRank());
   }
 
   double   maxDiff;
@@ -162,8 +167,30 @@ public class PageRank extends Benchmark {
         }
       }
     } else {
-      System.out.println("WARNING: No self-checking for n = '" + n + "', iteration = '" + iter + "', threshold = '" + thresh + "', and divisor = '" + divisor + "'");
+      return checkBasedOnFirstResult();
     }
+    return true;
+  }
+
+  private double[] firstResult;
+
+  private boolean checkBasedOnFirstResult() {
+    if (pageRanks.length != n) {
+      return false;
+    }
+
+    if (firstResult == null) {
+      firstResult = pageRanks;
+      pageRanks = null;
+      return true;
+    } else {
+      for (int i = 0; i < n; i++) {
+        if (firstResult[i] != pageRanks[i]) {
+          return false;
+        }
+      }
+    }
+
     return true;
   }
 }
