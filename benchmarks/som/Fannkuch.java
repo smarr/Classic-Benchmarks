@@ -89,10 +89,6 @@ public class Fannkuch extends Benchmark {
   public boolean innerBenchmarkLoop() {
     initialize(innerIterations);
     int result = maxPfannkuchen();
-    System.out.print("Pfannkuchen(");
-    System.out.print(innerIterations);
-    System.out.print(") = ");
-    System.out.println(result);
     return result == expectedResult(innerIterations);
   }
 
@@ -115,6 +111,6 @@ public class Fannkuch extends Benchmark {
     if (results == null) {
       results = new int[]{ 0, 1, 2, 4, 7, 10, 16, 22, 30, 38, 51, 65};
     }
-    return results[problemSize];
+    return results[problemSize - 1];
   }
 }
