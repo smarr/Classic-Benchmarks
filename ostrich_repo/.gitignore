@@ -1,0 +1,9 @@
+*.o
+*.bc
+*.js.map
+*.swp
+rodinia_2.4/
+.DS_Store
+build/
+*.pyc
+dls14empiricalJS/
