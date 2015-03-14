@@ -125,7 +125,7 @@ public class GraphSearch extends Benchmark {
     do {
       stop = false;
 
-      for(int tid = 0; tid < noOfNodes; ++tid) {
+      for (int tid = 0; tid < noOfNodes; ++tid) {
         if (hGraphMask[tid]) {
           hGraphMask[tid] = false;
           for (int i = hGraphNodes[tid].starting;
