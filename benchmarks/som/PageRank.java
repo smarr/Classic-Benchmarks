@@ -113,32 +113,23 @@ public class PageRank extends Benchmark {
   @Override
   public boolean innerBenchmarkLoop() {
     JenkinsRandom.setSeed(49734321);
-    n       = innerIterations;
-    iter    = 10;
-    thresh  = 0.00000001;
-    divisor = 100000;
-    return verifyResult(runPageRank());
+    // int n, int iter, double thresh, int divisor
+    // standard:
+    // n       = 5000
+    // iter    = 10
+    // thresh  = 0.00000001
+    // divisor = 100000
+    return verifyResult(runPageRank(innerIterations, 10, 0.00000001, 100000));
   }
 
-  double   maxDiff;
-  double[] pageRanks;
-  double[] maps;
-  int[]    nOutLinks;
-  int[]    pages;
-  int      t;
-  int      n;
-  int      iter;
-  int      divisor;
-  double   thresh;
+  private double[] runPageRank(final int n, final int iter, final double thresh, final int divisor) {
+    double maxDiff = Double.POSITIVE_INFINITY;
 
-  private double[] runPageRank() {
-    maxDiff = Double.POSITIVE_INFINITY;
+    double[] pageRanks = new double[n];     Arrays.fill(pageRanks, 1.0 / n);
+    double[] maps      = new double[n * n];
+    int[]    nOutLinks = new int[n];
 
-    pageRanks = new double[n];     Arrays.fill(pageRanks, 1.0 / n);
-    maps      = new double[n * n];
-    nOutLinks = new int[n];
-
-    pages = randomPages(n, nOutLinks, divisor);
+    int[] pages = randomPages(n, nOutLinks, divisor);
 
     int nbLinks = 0;
     for (int i = 0; i < n; ++i) {
@@ -147,6 +138,7 @@ public class PageRank extends Benchmark {
       }
     }
 
+    int t;
     for (t = 1; t <= iter && maxDiff >= thresh; ++t) {
       mapPageRank(pages, pageRanks, maps, nOutLinks, n);
       maxDiff = reducePageRank(pageRanks, maps, n);
@@ -156,7 +148,8 @@ public class PageRank extends Benchmark {
 
   @Override
   public boolean verifyResult(final Object result) {
-    if (n == 5000 && iter == 10 && thresh == 0.00000001 && divisor == 100000) {
+    double[] pageRanks = (double[]) result;
+    if (innerIterations == 5000) { // && standard: iter == 10 && thresh == 0.00000001 && divisor == 100000
       if (pageRanks.length != EXCPECTED_PAGE_RANKS.length) {
         throw new RuntimeException("Invalid length of page_ranks array");
       }
@@ -167,24 +160,23 @@ public class PageRank extends Benchmark {
         }
       }
     } else {
-      return checkBasedOnFirstResult();
+      return checkBasedOnFirstResult(pageRanks);
     }
     return true;
   }
 
   private double[] firstResult;
 
-  private boolean checkBasedOnFirstResult() {
-    if (pageRanks.length != n) {
+  private boolean checkBasedOnFirstResult(final double[] pageRanks) {
+    if (pageRanks.length != innerIterations) {
       return false;
     }
 
     if (firstResult == null) {
       firstResult = pageRanks;
-      pageRanks = null;
       return true;
     } else {
-      for (int i = 0; i < n; i++) {
+      for (int i = 0; i < innerIterations; i++) {
         if (firstResult[i] != pageRanks[i]) {
           return false;
         }
