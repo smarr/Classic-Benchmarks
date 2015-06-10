@@ -10,7 +10,7 @@ public class PageRank extends Benchmark {
     new PageRank().run(args);
   }
 
-  private static double D_FACTOR = 0.85; // damping factor
+  private static final double D_FACTOR = 0.85; // damping factor
 
   private static double[] EXCPECTED_PAGE_RANKS = {
     0.00005550000000000001,  0.000030000000000000004, 0.000030000000000000004,
