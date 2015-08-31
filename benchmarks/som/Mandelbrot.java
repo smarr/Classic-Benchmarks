@@ -40,7 +40,7 @@ package som;
 
 // http://benchmarksgame.alioth.debian.org/u64q/program.php?test=mandelbrot&lang=yarv&id=3
 
-class Mandelbrot extends Benchmark {
+final class Mandelbrot extends Benchmark {
 
   public static void main(final String[] args) {
     new Mandelbrot().run(args);
@@ -116,8 +116,6 @@ class Mandelbrot extends Benchmark {
        }
        y += 1;
      }
-
-     System.out.println(sum);
      return sum;
    }
 
