@@ -50,11 +50,13 @@ public class TreeSort extends Sort {
         tree.insert(array[i]);
       }
     }
+    return tree;
+  }
 
-    if (!tree.check()) {
-      error("Invalid result, tree not sorted");
-    }
-    return null;
+  @Override
+  public boolean verifyResult(final Object result) {
+    TreeNode r = (TreeNode) result;
+    return r.check();
   }
 
   @Override
