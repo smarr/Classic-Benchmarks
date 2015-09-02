@@ -41,7 +41,7 @@
 
 class Mandelbrot {
 
-   public static int mandelbrot(double size) {
+   public static int mandelbrot(final double size) {
      int sum = 0;
 
      int byte_acc = 0;
@@ -64,6 +64,7 @@ class Mandelbrot {
          while (z < 50) {
            double tr = zrzr - zizi + cr;
            double ti = 2.0*zr*zi + ci;
+
            zr = tr;
            zi = ti;
            // preserve recalculation
@@ -82,13 +83,11 @@ class Mandelbrot {
          // Code is very similar for these cases, but using separate blocks
          // ensures we skip the shifting when it's unnecessary, which is most cases.
          if (bit_num == 8) {
-           //print byte_acc.chr
            sum ^= byte_acc;
            byte_acc = 0;
            bit_num = 0;
          } else if (x == size - 1) {
            byte_acc <<= (8 - bit_num);
-           //print byte_acc.chr
            sum ^= byte_acc;
            byte_acc = 0;
            bit_num = 0;
@@ -97,7 +96,6 @@ class Mandelbrot {
        }
        y += 1;
      }
-
      return sum;
    }
 
@@ -111,7 +109,7 @@ class Mandelbrot {
       return mandelbrot(750) == 192;
    }
 
-   public static void main(String[] args) {
+   public static void main(final String[] args) {
       if (!sample()) {
           throw new RuntimeException();
       }
@@ -150,6 +148,10 @@ class Mandelbrot {
 
          System.out.println("Mandelbrot: iterations=1 runtime: " +
              elapsed + "us");
+      }
+
+      if (!sample()) {
+        throw new RuntimeException();
       }
    }
 }
