@@ -45,32 +45,34 @@ class Mandelbrot {
      int sum = 0;
 
      int byte_acc = 0;
-     int bit_num = 0;
+     int bit_num  = 0;
 
      int y = 0;
      while (y < size) {
-       double ci = (2.0*y/size)-1.0;
+       double ci = (2.0 * y / size) - 1.0;
 
        int x = 0;
        while (x < size) {
-         double zr = 0.0;
-         double zrzr = zr;
-         double zi = 0.0;
-         double zizi = zi;
-         double cr = (2.0*x/size)-1.5;
-         int escape = 1;
+         double zr   = 0.0;
+         double zrzr = 0.0;
+         double zi   = 0.0;
+         double zizi = 0.0;
+         double cr = (2.0 * x / size) - 1.5;
 
          int z = 0;
+         int escape = 1;
+
          while (z < 50) {
            double tr = zrzr - zizi + cr;
-           double ti = 2.0*zr*zi + ci;
+           double ti = 2.0 * zr * zi + ci;
 
            zr = tr;
            zi = ti;
+
            // preserve recalculation
            zrzr = zr*zr;
            zizi = zi*zi;
-           if (zrzr+zizi > 4.0) {
+           if (zrzr + zizi > 4.0) {
              escape = 0;
              break;
            }
@@ -85,12 +87,12 @@ class Mandelbrot {
          if (bit_num == 8) {
            sum ^= byte_acc;
            byte_acc = 0;
-           bit_num = 0;
+           bit_num  = 0;
          } else if (x == size - 1) {
            byte_acc <<= (8 - bit_num);
            sum ^= byte_acc;
            byte_acc = 0;
-           bit_num = 0;
+           bit_num  = 0;
          }
          x += 1;
        }
